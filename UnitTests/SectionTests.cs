@@ -1,31 +1,19 @@
-﻿using System;
+﻿using MyBeltTestingProgram.Data.Models;
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using MyBeltTestingProgram.Data;
-using MyBeltTestingProgram.Data.Models;
 
-namespace MyBeltTestingProgram.Controllers
+namespace UnitTests
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ValuesController : ControllerBase
+    public class SectionTests
     {
-        private readonly MyBeltTestingDBContext _context;
+        BeltTestProgram programKyu9;
 
-        public ValuesController(MyBeltTestingDBContext context)
+        [SetUp]
+        public void Setup()
         {
-            _context = context;
-        }
-
-        // GET api/values
-        [HttpGet]
-        public ActionResult<string> Get()
-        {
-            BeltTestProgram programKyu9 = new BeltTestProgram
+            programKyu9 = new BeltTestProgram
             {
-                Name = "Weißer Gürtel",
                 Graduation = new Graduation { Grade = 9, Type = GradeType.Kyu },
                 Kihon = new Kihon
                 {
@@ -112,46 +100,12 @@ namespace MyBeltTestingProgram.Controllers
                     }
                 }
             };
-
-            return Ok(programKyu9.ToString());
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<Combination> Get(int id)
+        [Test]
+        public void Test1()
         {
-            var stance = _context.Stances.Where(x => x.Symbol == "ZK").FirstOrDefault();
-            var move = _context.Moves.Where(x => x.Symbol == "=>").FirstOrDefault();
-            var technique = _context.Techniques.Where(x => x.Name == "Oi-Zuki").FirstOrDefault();
-
-            var motion = new Motion{
-                Stance = stance,
-                Move = move,
-                Technique = technique
-            };
-
-            var combo = new Combination();
-            combo.Motions.Add(motion);
-
-            return Ok(combo);
-        }
-
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            Assert.IsTrue(true);
         }
     }
 }
