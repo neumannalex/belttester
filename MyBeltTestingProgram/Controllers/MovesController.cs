@@ -13,6 +13,8 @@ using MyBeltTestingProgram.Data.Repositories;
 using MyBeltTestingProgram.Entities;
 using MyBeltTestingProgram.Entities.Move;
 using MyBeltTestingProgram.Helpers;
+using MyBeltTestingProgram.Services;
+using Sieve.Models;
 
 namespace MyBeltTestingProgram.Controllers
 {
@@ -22,78 +24,50 @@ namespace MyBeltTestingProgram.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IDataRepository _repository;
-        private IUrlHelper _urlHelper;
+        private readonly ISieveModelPreparer _sieveModelPreparer;
+        private readonly IPagingLinkCreator _pagingLinkCreator;
 
-        public MovesController(IMapper mapper, IDataRepository repository, IUrlHelper urlHelper)
+        public MovesController(IMapper mapper, IDataRepository repository, ISieveModelPreparer sieveModelPreparer, IPagingLinkCreator pagingLinkCreator)
         {
             _mapper = mapper;
             _repository = repository;
-            _urlHelper = urlHelper;
+            _sieveModelPreparer = sieveModelPreparer;
+            _pagingLinkCreator = pagingLinkCreator;
         }
 
-        private string CreateMovesResourceUri(QueryResourceParameters parameters, ResourceUriType type)
+        [HttpGet(Name = "GetMoves")]
+        public async Task<ActionResult<IEnumerable<MoveDTO>>> GetMoves([FromQuery]SieveModel sieveModel)
         {
-            switch (type)
-            {
-                case ResourceUriType.PreviousPage:
-                    return _urlHelper.Link("GetMoves",
-                        new
-                        {
-                            searchQuery = parameters.SearchQuery,
-                            pageNumber = parameters.PageNumber - 1,
-                            pageSize = parameters.PageSize
-                        });
-                case ResourceUriType.NextPage:
-                    return _urlHelper.Link("GetMoves",
-                        new
-                        {
-                            searchQuery = parameters.SearchQuery,
-                            pageNumber = parameters.PageNumber + 1,
-                            pageSize = parameters.PageSize
-                        });
+            _sieveModelPreparer.SetMissingValues(ref sieveModel);
 
-                default:
-                    return _urlHelper.Link("GetMoves",
-                    new
-                    {
-                        searchQuery = parameters.SearchQuery,
-                        pageNumber = parameters.PageNumber,
-                        pageSize = parameters.PageSize
-                    });
+            try
+            { 
+                var itemsFromRepo = await _repository.GetMoves(sieveModel);
+
+                var previousPageLink = itemsFromRepo.HasPrevious ? _pagingLinkCreator.CreatePreviousPageLink("GetMoves", sieveModel) : null;
+                var nextPageLink = itemsFromRepo.HasNext ? _pagingLinkCreator.CreateNextPageLink("GetMoves", sieveModel) : null;
+
+                var paginationMetadata = new PaginationMetadata
+                {
+                    TotalCount = itemsFromRepo.TotalCount,
+                    PageSize = itemsFromRepo.PageSize,
+                    CurrentPage = itemsFromRepo.CurrentPage,
+                    TotalPages = itemsFromRepo.TotalPages,
+                    PreviousPageLink = previousPageLink,
+                    NextPageLink = nextPageLink
+                };
+
+                Response.Headers.Add("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
+
+                var items = _mapper.Map<List<MoveDTO>>(itemsFromRepo);
+                return Ok(items);
+            }
+            catch (RepositoryFilterException ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
-        // GET: api/Moves
-        [HttpGet(Name = "GetMoves")]
-        public async Task<ActionResult<IEnumerable<MoveDTO>>> GetMoves([FromQuery]QueryResourceParameters parameters)
-        {
-            var itemsFromRepo = await _repository.GetMoves(parameters);
-
-            var previousPageLink = itemsFromRepo.HasPrevious ?
-                CreateMovesResourceUri(parameters,
-                ResourceUriType.PreviousPage) : null;
-
-            var nextPageLink = itemsFromRepo.HasNext ?
-                CreateMovesResourceUri(parameters,
-                ResourceUriType.NextPage) : null;
-
-            var paginationMetadata = new PaginationMetadata
-            {
-                TotalCount = itemsFromRepo.TotalCount,
-                PageSize = itemsFromRepo.PageSize,
-                CurrentPage = itemsFromRepo.CurrentPage,
-                TotalPages = itemsFromRepo.TotalPages,
-                PreviousPageLink = previousPageLink,
-                NextPageLink = nextPageLink
-            };
-
-            Response.Headers.Add("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
-
-            var items = _mapper.Map<List<MoveDTO>>(itemsFromRepo);
-            return Ok(items);
-        }
-
-        // GET: api/Moves/5
         [HttpGet("{id}", Name = "GetMove")]
         public async Task<ActionResult<MoveDTO>> GetMove(int id)
         {
@@ -105,7 +79,6 @@ namespace MyBeltTestingProgram.Controllers
             return Ok(_mapper.Map<MoveDTO>(item));
         }
 
-        // PUT: api/Moves/5
         [HttpPut("{id}")]
         public async Task<ActionResult<MoveDTO>> PutMove(int id, [FromBody]MoveDTOForUpdate itemForUpdate)
         {
@@ -164,7 +137,6 @@ namespace MyBeltTestingProgram.Controllers
             }
         }
 
-        // POST: api/Moves
         [HttpPost]
         public async Task<ActionResult<MoveDTO>> PostMove([FromBody]MoveDTOForCreation itemForCreation)
         {
@@ -178,11 +150,11 @@ namespace MyBeltTestingProgram.Controllers
 
             try
             {
-                var success = await _repository.AddMove(item);
-                if (success)
-                    return CreatedAtAction("GetMove", new { id = item.ID }, _mapper.Map<MoveDTO>(item));
-                else
+                var addedItem = await _repository.AddMove(item);
+                if (addedItem == null)
                     return BadRequest("Saving item failed.");
+                else
+                    return CreatedAtAction("GetMove", new { id = item.ID }, _mapper.Map<MoveDTO>(addedItem));
             }
             catch (RepositoryItemAlreadyExistsException)
             {
@@ -190,7 +162,6 @@ namespace MyBeltTestingProgram.Controllers
             }
         }
 
-        // DELETE: api/Moves/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMove(int id)
         {

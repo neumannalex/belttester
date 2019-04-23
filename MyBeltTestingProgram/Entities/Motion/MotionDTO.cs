@@ -11,6 +11,7 @@ namespace MyBeltTestingProgram.Entities.Motion
 {
     public class MotionDTO
     {
+        public int ID { get; set; }
         public StanceDTO Stance { get; set; }
         public MoveDTO Move { get; set; }
         public TechniqueDTO Technique { get; set; }

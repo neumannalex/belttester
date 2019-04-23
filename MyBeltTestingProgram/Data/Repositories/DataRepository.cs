@@ -25,48 +25,6 @@ namespace MyBeltTestingProgram.Data.Repositories
         }
 
         #region Techniques
-        private IQueryable<Technique> BuildFilterForTechniques(IQueryable<Technique> items, string query)
-        {
-            if (query.Contains("="))
-            {
-                var pairs = query.Split("&").ToList();
-                foreach (var pair in pairs)
-                {
-                    var keyAndValue = pair.Split("=");
-                    if (keyAndValue.Count() > 1)
-                    {
-                        var key = keyAndValue[0].Trim().ToLowerInvariant();
-                        var value = keyAndValue[1].Trim().ToLowerInvariant();
-
-                        switch (key)
-                        {
-                            case "name":
-                                items = items.Where(x => x.Name.ToLowerInvariant().Contains(value));
-                                break;
-                            case "annotation":
-                                items = items.Where(x => x.Annotation.ToLowerInvariant().Contains(value));
-                                break;
-                            case "purpose":
-                                items = items.Where(x => x.Purpose.ToString().ToLowerInvariant().Contains(value));
-                                break;
-                            case "weapon":
-                                items = items.Where(x => x.Weapon.ToString().ToLowerInvariant().Contains(value));
-                                break;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                items = items.Where(x => x.Name.ToLowerInvariant().Contains(query) ||
-                                         x.Annotation.ToLowerInvariant().Contains(query) ||
-                                         x.Purpose.ToString().ToLowerInvariant().Contains(query) ||
-                                         x.Weapon.ToString().ToLowerInvariant().Contains(query));
-            }
-
-            return items;
-        }
-
         public async Task<bool> TechniqueExists(int id)
         {
             return await _context.Techniques.AnyAsync(x => x.ID == id);
@@ -82,38 +40,58 @@ namespace MyBeltTestingProgram.Data.Repositories
             return item;
         }
 
-        public async Task<PagedList<Technique>> GetAllTechniques(QueryResourceParameters parameters)
+        public async Task<Technique> GetTechnique(Technique technique)
         {
-            var itemsBeforeProcessing = _context.Techniques.OrderBy(x => x.Name).AsQueryable();
+            var item = await _context.Techniques.Where(x => x.Name.ToLowerInvariant() == technique.Name.ToLowerInvariant() &&
+                                                            x.Level == technique.Level &&
+                                                            x.Purpose == technique.Purpose &&
+                                                            x.Weapon == technique.Weapon).FirstOrDefaultAsync();
 
-            return await PagedList<Technique>.Create(itemsBeforeProcessing, parameters.PageNumber, parameters.PageSize);
+            return item;
         }
 
-        public async Task<PagedList<Technique>> GetTechniques(QueryResourceParameters parameters)
+        public  async Task<IEnumerable<Technique>> GetTechniquesByName(string name)
+        {
+            var item = await _context.Techniques.Where(x => x.Name.ToLowerInvariant() == name.ToLowerInvariant()).ToListAsync();
+
+            return item;
+        }
+
+        public async Task<List<Technique>> GetAllTechniques()
         {
             var itemsBeforeProcessing = _context.Techniques.OrderBy(x => x.Name).AsQueryable();
 
-            if(!string.IsNullOrEmpty(parameters.SearchQuery))
-            {
-                var query = parameters.SearchQuery.Trim().ToLowerInvariant();
-                itemsBeforeProcessing = BuildFilterForTechniques(itemsBeforeProcessing, parameters.SearchQuery);
+            return await itemsBeforeProcessing.ToListAsync();
+        }
+
+        public async Task<PagedList<Technique>> GetTechniques(SieveModel sieveModel)
+        {
+            try
+            { 
+                var items = _context.Techniques.AsQueryable();
+
+                var processedItems = _sieveProcessor.Apply(sieveModel, items, applyPagination: false);
+
+                return await PagedList<Technique>.Create(processedItems, sieveModel.Page.Value, sieveModel.PageSize.Value);
             }
-
-            return await PagedList<Technique>.Create(itemsBeforeProcessing, parameters.PageNumber, parameters.PageSize);
+            catch (Exception ex)
+            {
+                throw new RepositoryFilterException(ex.Message);
+            }
         }
 
-        public async Task<bool> AddTechnique(Technique technique)
+        public async Task<Technique> AddTechnique(Technique technique)
         {
-            var existingTechnique = await _context.Techniques.Where(x => x.Name.ToLower() == technique.Name.ToLower() &&
-                                                                    x.Annotation.ToLower() == technique.Annotation.ToLower() &&
-                                                                    x.Purpose == technique.Purpose &&
-                                                                    x.Weapon == technique.Weapon).FirstOrDefaultAsync();
+            var existingTechnique = await GetTechnique(technique);
 
             if (existingTechnique != null)
                 throw new RepositoryItemAlreadyExistsException();
 
             _context.Techniques.Add(technique);
-            return (await _context.SaveChangesAsync() >= 0);
+            if (await _context.SaveChangesAsync() >= 0)
+                return technique;
+            else
+                return null;
         }
 
         public async Task<bool> UpdateTechnique(int id, Technique technique)
@@ -151,40 +129,6 @@ namespace MyBeltTestingProgram.Data.Repositories
         #endregion
 
         #region Stances
-        private IQueryable<Stance> BuildFilterForStances(IQueryable<Stance> items, string query)
-        {
-            if (query.Contains("="))
-            {
-                var pairs = query.Split("&").ToList();
-                foreach (var pair in pairs)
-                {
-                    var keyAndValue = pair.Split("=");
-                    if (keyAndValue.Count() > 1)
-                    {
-                        var key = keyAndValue[0].Trim().ToLowerInvariant();
-                        var value = keyAndValue[1].Trim().ToLowerInvariant();
-
-                        switch (key)
-                        {
-                            case "name":
-                                items = items.Where(x => x.Name.ToLowerInvariant().Contains(value));
-                                break;
-                            case "symbol":
-                                items = items.Where(x => x.Symbol.ToLowerInvariant().Contains(value));
-                                break;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                items = items.Where(x => x.Name.ToLowerInvariant().Contains(query) ||
-                                         x.Symbol.ToLowerInvariant().Contains(query));
-            }
-
-            return items;
-        }
-
         public async Task<bool> StanceExists(int id)
         {
             return await _context.Stances.AnyAsync(x => x.ID == id);
@@ -200,36 +144,55 @@ namespace MyBeltTestingProgram.Data.Repositories
             return item;
         }
 
-        public async Task<PagedList<Stance>> GetAllStances(QueryResourceParameters parameters)
+        public async Task<Stance> GetStance(Stance stance)
         {
-            var itemsBeforeProcessing = _context.Stances.OrderBy(x => x.Name).AsQueryable();
+            var item = await _context.Stances.Where(x => x.Name.ToLowerInvariant() == stance.Name.ToLowerInvariant() &&
+                                                         x.Symbol.ToLowerInvariant() == stance.Symbol.ToLowerInvariant()).FirstOrDefaultAsync();
 
-            return await PagedList<Stance>.Create(itemsBeforeProcessing, parameters.PageNumber, parameters.PageSize);
+            return item;
         }
 
-        public async Task<PagedList<Stance>> GetStances(QueryResourceParameters parameters)
+        public async Task<Stance> GetStanceBySymbol(string symbol)
+        {
+            var item = await _context.Stances.Where(x => x.Symbol.ToLowerInvariant() == symbol.ToLowerInvariant()).FirstOrDefaultAsync();
+
+            return item;
+        }
+
+        public async Task<List<Stance>> GetAllStances()
         {
             var itemsBeforeProcessing = _context.Stances.OrderBy(x => x.Name).AsQueryable();
+            return await itemsBeforeProcessing.ToListAsync();
+        }
 
-            if (!string.IsNullOrEmpty(parameters.SearchQuery))
-            {
-                var query = parameters.SearchQuery.Trim().ToLowerInvariant();
-                itemsBeforeProcessing = BuildFilterForStances(itemsBeforeProcessing, parameters.SearchQuery);
+        public async Task<PagedList<Stance>> GetStances(SieveModel sieveModel)
+        {
+            try
+            { 
+                var items = _context.Stances.AsQueryable();
+
+                var processedItems = _sieveProcessor.Apply(sieveModel, items, applyPagination: false);
+
+                return await PagedList<Stance>.Create(processedItems, sieveModel.Page.Value, sieveModel.PageSize.Value);
             }
-
-            return await PagedList<Stance>.Create(itemsBeforeProcessing, parameters.PageNumber, parameters.PageSize);
+            catch (Exception ex)
+            {
+                throw new RepositoryFilterException(ex.Message);
+            }
         }
 
-        public async Task<bool> AddStance(Stance stance)
+        public async Task<Stance> AddStance(Stance stance)
         {
-            var existingItem = await _context.Stances.Where(x => x.Name.ToLower() == stance.Name.ToLower() &&
-                                                                    x.Symbol.ToLower() == stance.Symbol.ToLower()).FirstOrDefaultAsync();
+            var existingItem = await GetStance(stance);
 
             if (existingItem != null)
                 throw new RepositoryItemAlreadyExistsException();
 
             _context.Stances.Add(stance);
-            return (await _context.SaveChangesAsync() >= 0);
+            if (await _context.SaveChangesAsync() >= 0)
+                return stance;
+            else
+                return null;
         }
 
         public async Task<bool> UpdateStance(int id, Stance stance)
@@ -267,40 +230,6 @@ namespace MyBeltTestingProgram.Data.Repositories
         #endregion
 
         #region Moves
-        private IQueryable<Move> BuildFilterForMoves(IQueryable<Move> items, string query)
-        {
-            if (query.Contains("="))
-            {
-                var pairs = query.Split("&").ToList();
-                foreach (var pair in pairs)
-                {
-                    var keyAndValue = pair.Split("=");
-                    if (keyAndValue.Count() > 1)
-                    {
-                        var key = keyAndValue[0].Trim().ToLowerInvariant();
-                        var value = keyAndValue[1].Trim().ToLowerInvariant();
-
-                        switch (key)
-                        {
-                            case "name":
-                                items = items.Where(x => x.Name.ToLowerInvariant().Contains(value));
-                                break;
-                            case "symbol":
-                                items = items.Where(x => x.Symbol.ToLowerInvariant().Contains(value));
-                                break;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                items = items.Where(x => x.Name.ToLowerInvariant().Contains(query) ||
-                                         x.Symbol.ToLowerInvariant().Contains(query));
-            }
-
-            return items;
-        }
-
         public async Task<bool> MoveExists(int id)
         {
             return await _context.Moves.AnyAsync(x => x.ID == id);
@@ -316,36 +245,55 @@ namespace MyBeltTestingProgram.Data.Repositories
             return item;
         }
 
-        public async Task<PagedList<Move>> GetAllMoves(QueryResourceParameters parameters)
+        public async Task<Move> GetMove(Move move)
         {
-            var itemsBeforeProcessing = _context.Moves.OrderBy(x => x.Name).AsQueryable();
+            var item = await _context.Moves.Where(x => x.Name.ToLowerInvariant() == move.Name.ToLowerInvariant() &&
+                                                       x.Symbol.ToLowerInvariant() == move.Symbol.ToLowerInvariant()).FirstOrDefaultAsync();
 
-            return await PagedList<Move>.Create(itemsBeforeProcessing, parameters.PageNumber, parameters.PageSize);
+            return item;
         }
 
-        public async Task<PagedList<Move>> GetMoves(QueryResourceParameters parameters)
+        public async Task<Move> GetMoveBySymbol(string symbol)
+        {
+            var item = await _context.Moves.Where(x => x.Symbol.ToLowerInvariant() == symbol.ToLowerInvariant()).FirstOrDefaultAsync();
+
+            return item;
+        }
+
+        public async Task<List<Move>> GetAllMoves()
         {
             var itemsBeforeProcessing = _context.Moves.OrderBy(x => x.Name).AsQueryable();
+            return await itemsBeforeProcessing.ToListAsync();
+        }
 
-            if (!string.IsNullOrEmpty(parameters.SearchQuery))
-            {
-                var query = parameters.SearchQuery.Trim().ToLowerInvariant();
-                itemsBeforeProcessing = BuildFilterForMoves(itemsBeforeProcessing, parameters.SearchQuery);
+        public async Task<PagedList<Move>> GetMoves(SieveModel sieveModel)
+        {
+            try
+            { 
+                var items = _context.Moves.AsQueryable();
+
+                var processedItems = _sieveProcessor.Apply(sieveModel, items, applyPagination: false);
+
+                return await PagedList<Move>.Create(processedItems, sieveModel.Page.Value, sieveModel.PageSize.Value);
             }
-
-            return await PagedList<Move>.Create(itemsBeforeProcessing, parameters.PageNumber, parameters.PageSize);
+            catch (Exception ex)
+            {
+                throw new RepositoryFilterException(ex.Message);
+            }
         }
 
-        public async Task<bool> AddMove(Move move)
+        public async Task<Move> AddMove(Move move)
         {
-            var existingItem = await _context.Stances.Where(x => x.Name.ToLower() == move.Name.ToLower() &&
-                                                                    x.Symbol.ToLower() == move.Symbol.ToLower()).FirstOrDefaultAsync();
+            var existingItem = await GetMove(move);
 
             if (existingItem != null)
                 throw new RepositoryItemAlreadyExistsException();
 
             _context.Moves.Add(move);
-            return (await _context.SaveChangesAsync() >= 0);
+            if (await _context.SaveChangesAsync() >= 0)
+                return move;
+            else
+                return null;
         }
 
         public async Task<bool> UpdateMove(int id, Move move)
@@ -382,54 +330,10 @@ namespace MyBeltTestingProgram.Data.Repositories
         }
         #endregion
 
-
         #region Combinations
-        private IQueryable<Combination> BuildFilterForCombinations(IQueryable<Combination> items, string query)
+        public async Task<bool> CombinationExists(int id)
         {
-            if (query.Contains("="))
-            {
-                var pairs = query.Split("&").ToList();
-                foreach (var pair in pairs)
-                {
-                    var keyAndValue = pair.Split("=");
-                    if (keyAndValue.Count() > 1)
-                    {
-                        var key = keyAndValue[0].Trim().ToLowerInvariant();
-                        var value = keyAndValue[1].Trim().ToLowerInvariant();
-
-                        switch (key)
-                        {
-                            case "stance":
-                                items = items.Where(x => x.Motions.Where(y => y.Stance.Name.ToLowerInvariant().Contains(value) ||
-                                                                              y.Stance.Symbol.ToLowerInvariant().Contains(value)).Count() > 0);
-                                break;
-                            case "move":
-                                items = items.Where(x => x.Motions.Where(y => y.Move.Name.ToLowerInvariant().Contains(value) ||
-                                                                              y.Move.Symbol.ToLowerInvariant().Contains(value)).Count() > 0);
-                                break;
-                            case "technique":
-                                items = items.Where(x => x.Motions.Where(y => y.Technique.Name.ToLowerInvariant().Contains(value) ||
-                                                                              y.Technique.Purpose.ToString().ToLowerInvariant().Contains(value) ||
-                                                                              y.Technique.Weapon.ToString().ToLowerInvariant().Contains(value)).Count() > 0);
-                                break;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                query = query.Trim().ToLowerInvariant();
-
-                items = items.Where(x => x.Motions.Where(y => y.Technique.Name.ToLowerInvariant().Contains(query) ||
-                                                              y.Technique.Purpose.ToString().ToLowerInvariant().Contains(query) ||
-                                                              y.Technique.Weapon.ToString().ToLowerInvariant().Contains(query) ||
-                                                              y.Stance.Name.ToLowerInvariant().Contains(query) ||
-                                                              y.Stance.Symbol.ToLowerInvariant().Contains(query) ||
-                                                              y.Move.Name.ToLowerInvariant().Contains(query) ||
-                                                              y.Move.Symbol.ToLowerInvariant().Contains(query)).Count() > 0);
-            }
-
-            return items;
+            return await _context.Combinations.AnyAsync(x => x.ID == id);
         }
 
         public async Task<Combination> GetCombination(int id)
@@ -446,20 +350,20 @@ namespace MyBeltTestingProgram.Data.Repositories
             return item;
         }
 
-        public async Task<PagedList<Combination>> GetAllCombinations(QueryResourceParameters parameters)
+        public async Task<Combination> GetCombination(Combination combination)
         {
-            var items = _context.Combinations
-                .Include(x => x.Motions)
+            var item = await _context.Combinations
+                .Include(combo => combo.Motions)
                 .Include("Motions.Stance")
                 .Include("Motions.Move")
                 .Include("Motions.Technique")
-                .OrderBy(x => x.ID)
-                .AsQueryable();
+                //.Where(x => x.Hash == combination.Hash)
+                .FirstOrDefaultAsync();
 
-            return await PagedList<Combination>.Create(items, parameters.PageNumber, parameters.PageSize);
+            return item;
         }
 
-        public async Task<PagedList<Combination>> GetCombinations(QueryResourceParameters parameters)
+        public async Task<List<Combination>> GetAllCombinations()
         {
             var items = _context.Combinations
                 .Include(x => x.Motions)
@@ -469,44 +373,110 @@ namespace MyBeltTestingProgram.Data.Repositories
                 .OrderBy(x => x.ID)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(parameters.SearchQuery))
-            {
-                var query = parameters.SearchQuery.Trim().ToLowerInvariant();
-                items = BuildFilterForCombinations(items, parameters.SearchQuery);
-            }
-
-            return await PagedList<Combination>.Create(items, parameters.PageNumber, parameters.PageSize);
+            return await items.ToListAsync();
         }
 
         public async Task<PagedList<Combination>> GetCombinations(SieveModel sieveModel)
         {
-            var motions = _context.Motions
-                .Include("Stance")
-                .Include("Move")
-                .Include("Technique")
-                .AsQueryable();
-
             try
             {
-                var filteredMotions = _sieveProcessor.Apply(sieveModel, motions, applyPagination: false);
-                var comboIds = filteredMotions.Select(x => x.CombinationId).Distinct().ToList();
+                if (sieveModel.Filters != null && sieveModel.Filters.Length > 0)
+                {
+                    var motions = _context.Motions
+                        .Include("Stance")
+                        .Include("Move")
+                        .Include("Technique")
+                        .AsQueryable();
 
-                var combos = _context.Combinations
-                                    .Include(x => x.Motions)
-                                    .Include("Motions.Stance")
-                                    .Include("Motions.Move")
-                                    .Include("Motions.Technique")
-                                    .Where(x => comboIds.Contains(x.ID))
-                                    .OrderBy(x => x.ID)
-                                    .AsQueryable();
+                    var filteredMotions = _sieveProcessor.Apply(sieveModel, motions, applyPagination: false);
+                    var comboIds = filteredMotions.Select(x => x.CombinationId).Distinct().ToList();
 
-                return await PagedList<Combination>.Create(combos, sieveModel.Page.Value, sieveModel.PageSize.Value);
+                    var combos = _context.Combinations
+                                        .Include(x => x.Motions)
+                                        .Include("Motions.Stance")
+                                        .Include("Motions.Move")
+                                        .Include("Motions.Technique")
+                                        .Where(x => comboIds.Contains(x.ID))
+                                        .OrderBy(x => x.ID)
+                                        .AsQueryable();
+
+                    return await PagedList<Combination>.Create(combos, sieveModel.Page.Value, sieveModel.PageSize.Value);
+                }
+                else
+                {
+                    var combos = _context.Combinations
+                                        .Include(x => x.Motions)
+                                        .Include("Motions.Stance")
+                                        .Include("Motions.Move")
+                                        .Include("Motions.Technique")
+                                        .OrderBy(x => x.ID)
+                                        .AsQueryable();
+
+                    return await PagedList<Combination>.Create(combos, sieveModel.Page.Value, sieveModel.PageSize.Value);
+                }
             }
             catch(Exception ex)
             {
-                //Console.WriteLine(ex.Message);
-                return null;
+                throw new RepositoryFilterException(ex.Message);
             }
+        }
+
+        public async Task<Combination> AddCombination(Combination combination)
+        {
+            if (combination.Motions.Count <= 0)
+                return null;
+
+            foreach(var motion in combination.Motions)
+            {
+                Stance stance;
+                Move move;
+                Technique technique;
+
+                if(motion.StanceId > 0)
+                    stance = await GetStance(motion.StanceId);
+                else
+                    stance = await GetStance(motion.Stance);
+
+                if (motion.MoveId > 0)
+                    move = await GetMove(motion.MoveId);
+                else
+                    move = await GetMove(motion.Move);
+
+                if (motion.TechniqueId > 0)
+                    technique = await GetTechnique(motion.TechniqueId);
+                else
+                    technique = await GetTechnique(motion.Technique);
+
+                if (stance == null || move == null || technique == null)
+                {
+                    string message = $"Invalid motion with SequenceNumber { motion.SequenceNumber}.\n";
+                    message += stance == null ? "Stance is null\n" : "Stance is okay\n";
+                    message += move == null ? "Move is null\n" : "Move is okay\n";
+                    message += technique == null ? "Technique is null\n" : "Technique is okay\n";
+
+                    throw new Exception(message);
+                }
+
+                motion.StanceId = stance.ID;
+                motion.MoveId = move.ID;
+                motion.TechniqueId = technique.ID;
+            }
+
+            _context.Combinations.Add(combination);
+            if (await _context.SaveChangesAsync() >= 0)
+                return combination;
+            else
+                return null;
+        }
+
+        public async Task<bool> DeleteCombination(int id)
+        {
+            var item = await GetCombination(id);
+            if (item == null)
+                throw new RepositoryItemNotFoundException();
+
+            _context.Combinations.Remove(item);
+            return (await _context.SaveChangesAsync() >= 0);
         }
         #endregion
     }

@@ -13,6 +13,8 @@ using MyBeltTestingProgram.Data.Repositories;
 using MyBeltTestingProgram.Entities;
 using MyBeltTestingProgram.Entities.Stance;
 using MyBeltTestingProgram.Helpers;
+using MyBeltTestingProgram.Services;
+using Sieve.Models;
 
 namespace MyBeltTestingProgram.Controllers
 {
@@ -22,74 +24,48 @@ namespace MyBeltTestingProgram.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IDataRepository _repository;
-        private IUrlHelper _urlHelper;
+        private readonly ISieveModelPreparer _sieveModelPreparer;
+        private readonly IPagingLinkCreator _pagingLinkCreator;
 
-        public StancesController(IMapper mapper, IDataRepository repository, IUrlHelper urlHelper)
+        public StancesController(IMapper mapper, IDataRepository repository, ISieveModelPreparer sieveModelPreparer, IPagingLinkCreator pagingLinkCreator)
         {
             _mapper = mapper;
             _repository = repository;
-            _urlHelper = urlHelper;
-        }
-
-        private string CreateStancesResourceUri(QueryResourceParameters parameters, ResourceUriType type)
-        {
-            switch (type)
-            {
-                case ResourceUriType.PreviousPage:
-                    return _urlHelper.Link("GetStances",
-                        new
-                        {
-                            searchQuery = parameters.SearchQuery,
-                            pageNumber = parameters.PageNumber - 1,
-                            pageSize = parameters.PageSize
-                        });
-                case ResourceUriType.NextPage:
-                    return _urlHelper.Link("GetStances",
-                        new
-                        {
-                            searchQuery = parameters.SearchQuery,
-                            pageNumber = parameters.PageNumber + 1,
-                            pageSize = parameters.PageSize
-                        });
-
-                default:
-                    return _urlHelper.Link("GetStances",
-                    new
-                    {
-                        searchQuery = parameters.SearchQuery,
-                        pageNumber = parameters.PageNumber,
-                        pageSize = parameters.PageSize
-                    });
-            }
+            _sieveModelPreparer = sieveModelPreparer;
+            _pagingLinkCreator = pagingLinkCreator;
         }
 
         [HttpGet(Name = "GetStances")]
-        public async Task<ActionResult<IEnumerable<StanceDTO>>> GetStances([FromQuery]QueryResourceParameters parameters)
+        public async Task<ActionResult<IEnumerable<StanceDTO>>> GetStances([FromQuery]SieveModel sieveModel)
         {
-            var itemsFromRepo = await _repository.GetStances(parameters);
+            _sieveModelPreparer.SetMissingValues(ref sieveModel);
 
-            var previousPageLink = itemsFromRepo.HasPrevious ?
-                CreateStancesResourceUri(parameters,
-                ResourceUriType.PreviousPage) : null;
+            try
+            { 
+                var itemsFromRepo = await _repository.GetStances(sieveModel);
 
-            var nextPageLink = itemsFromRepo.HasNext ?
-                CreateStancesResourceUri(parameters,
-                ResourceUriType.NextPage) : null;
+                var previousPageLink = itemsFromRepo.HasPrevious ? _pagingLinkCreator.CreatePreviousPageLink("GetStances", sieveModel) : null;
+                var nextPageLink = itemsFromRepo.HasNext ? _pagingLinkCreator.CreateNextPageLink("GetStances", sieveModel) : null;
 
-            var paginationMetadata = new PaginationMetadata
+                var paginationMetadata = new PaginationMetadata
+                {
+                    TotalCount = itemsFromRepo.TotalCount,
+                    PageSize = itemsFromRepo.PageSize,
+                    CurrentPage = itemsFromRepo.CurrentPage,
+                    TotalPages = itemsFromRepo.TotalPages,
+                    PreviousPageLink = previousPageLink,
+                    NextPageLink = nextPageLink
+                };
+
+                Response.Headers.Add("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
+
+                var items = _mapper.Map<List<StanceDTO>>(itemsFromRepo);
+                return Ok(items);
+            }
+            catch (RepositoryFilterException ex)
             {
-                TotalCount = itemsFromRepo.TotalCount,
-                PageSize = itemsFromRepo.PageSize,
-                CurrentPage = itemsFromRepo.CurrentPage,
-                TotalPages = itemsFromRepo.TotalPages,
-                PreviousPageLink = previousPageLink,
-                NextPageLink = nextPageLink
-            };
-
-            Response.Headers.Add("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
-
-            var items = _mapper.Map<List<StanceDTO>>(itemsFromRepo);
-            return Ok(items);
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("{id}", Name = "GetStance")]
@@ -174,11 +150,11 @@ namespace MyBeltTestingProgram.Controllers
 
             try
             {
-                var success = await _repository.AddStance(item);
-                if (success)
-                    return CreatedAtAction("GetStance", new { id = item.ID }, _mapper.Map<StanceDTO>(item));
-                else
+                var addedItem = await _repository.AddStance(item);
+                if (addedItem == null)
                     return BadRequest("Saving item failed.");
+                else
+                    return CreatedAtAction("GetStance", new { id = item.ID }, _mapper.Map<StanceDTO>(addedItem));
             }
             catch (RepositoryItemAlreadyExistsException)
             {

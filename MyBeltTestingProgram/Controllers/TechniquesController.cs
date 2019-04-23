@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using MyBeltTestingProgram.Data.Models;
@@ -6,6 +8,8 @@ using MyBeltTestingProgram.Data.Repositories;
 using MyBeltTestingProgram.Entities;
 using MyBeltTestingProgram.Entities.Technique;
 using MyBeltTestingProgram.Helpers;
+using MyBeltTestingProgram.Services;
+using Sieve.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,78 +17,53 @@ namespace MyBeltTestingProgram.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TechniquesController : ControllerBase
     {
         private readonly IMapper _mapper;
         private readonly IDataRepository _repository;
-        private IUrlHelper _urlHelper;
+        private readonly ISieveModelPreparer _sieveModelPreparer;
+        private readonly IPagingLinkCreator _pagingLinkCreator;
 
-        public TechniquesController(IMapper mapper, IDataRepository repository, IUrlHelper urlHelper)
+        public TechniquesController(IMapper mapper, IDataRepository repository,ISieveModelPreparer sieveModelPreparer, IPagingLinkCreator pagingLinkCreator)
         {
             _mapper = mapper;
             _repository = repository;
-            _urlHelper = urlHelper;
-        }
-
-        private string CreateTechniquesResourceUri(QueryResourceParameters parameters, ResourceUriType type)
-        {
-            switch (type)
-            {
-                case ResourceUriType.PreviousPage:
-                    return _urlHelper.Link("GetTechniques",
-                        new
-                        {
-                            searchQuery = parameters.SearchQuery,
-                            pageNumber = parameters.PageNumber - 1,
-                            pageSize = parameters.PageSize
-                        });
-                case ResourceUriType.NextPage:
-                    return _urlHelper.Link("GetTechniques",
-                        new
-                        {
-                            searchQuery = parameters.SearchQuery,
-                            pageNumber = parameters.PageNumber + 1,
-                            pageSize = parameters.PageSize
-                        });
-
-                default:
-                    return _urlHelper.Link("GetTechniques",
-                    new
-                    {
-                        searchQuery = parameters.SearchQuery,
-                        pageNumber = parameters.PageNumber,
-                        pageSize = parameters.PageSize
-                    });
-            }
+            _sieveModelPreparer = sieveModelPreparer;
+            _pagingLinkCreator = pagingLinkCreator;
         }
 
         [HttpGet(Name = "GetTechniques")]
-        public async Task<ActionResult<IEnumerable<TechniqueDTO>>> GetTechniques([FromQuery]QueryResourceParameters parameters)
+        public async Task<ActionResult<IEnumerable<TechniqueDTO>>> GetTechniques([FromQuery]SieveModel sieveModel)
         {
-            var itemsFromRepo = await _repository.GetTechniques(parameters);
+            _sieveModelPreparer.SetMissingValues(ref sieveModel);
 
-            var previousPageLink = itemsFromRepo.HasPrevious ?
-                CreateTechniquesResourceUri(parameters,
-                ResourceUriType.PreviousPage) : null;
-
-            var nextPageLink = itemsFromRepo.HasNext ?
-                CreateTechniquesResourceUri(parameters,
-                ResourceUriType.NextPage) : null;
-
-            var paginationMetadata = new PaginationMetadata
+            try
             {
-                TotalCount = itemsFromRepo.TotalCount,
-                PageSize = itemsFromRepo.PageSize,
-                CurrentPage = itemsFromRepo.CurrentPage,
-                TotalPages = itemsFromRepo.TotalPages,
-                PreviousPageLink = previousPageLink,
-                NextPageLink = nextPageLink
-            };
+                var itemsFromRepo = await _repository.GetTechniques(sieveModel);
 
-            Response.Headers.Add("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
+                var previousPageLink = itemsFromRepo.HasPrevious ? _pagingLinkCreator.CreatePreviousPageLink("GetTechniques", sieveModel) : null;
+                var nextPageLink = itemsFromRepo.HasNext ? _pagingLinkCreator.CreateNextPageLink("GetTechniques", sieveModel) : null;
 
-            var items = _mapper.Map<List<TechniqueDTO>>(itemsFromRepo);
-            return Ok(items);
+                var paginationMetadata = new PaginationMetadata
+                {
+                    TotalCount = itemsFromRepo.TotalCount,
+                    PageSize = itemsFromRepo.PageSize,
+                    CurrentPage = itemsFromRepo.CurrentPage,
+                    TotalPages = itemsFromRepo.TotalPages,
+                    PreviousPageLink = previousPageLink,
+                    NextPageLink = nextPageLink
+                };
+
+                Response.Headers.Add("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
+
+                var items = _mapper.Map<List<TechniqueDTO>>(itemsFromRepo);
+                return Ok(items);
+            }
+            catch (RepositoryFilterException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("{id}", Name = "GetTechnique")]
@@ -169,11 +148,11 @@ namespace MyBeltTestingProgram.Controllers
 
             try
             {
-                var success = await _repository.AddTechnique(item);
-                if (success)
-                    return CreatedAtAction("GetTechnique", new { id = item.ID }, _mapper.Map<TechniqueDTO>(item));
-                else
+                var addedItem = await _repository.AddTechnique(item);
+                if (addedItem == null)
                     return BadRequest("Saving item failed.");
+                else
+                    return CreatedAtAction("GetTechnique", new { id = item.ID }, _mapper.Map<TechniqueDTO>(addedItem));
             }
             catch(RepositoryItemAlreadyExistsException)
             {

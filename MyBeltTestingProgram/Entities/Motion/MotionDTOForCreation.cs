@@ -7,8 +7,9 @@ namespace MyBeltTestingProgram.Entities.Motion
 {
     public class MotionDTOForCreation
     {
-        public int StanceId { get; set; }
-        public int MoveId { get; set; }
-        public int TechniqueId { get; set; }
+        public string StanceSymbol { get; set; }
+        public string MoveSymbol { get; set; }
+        public string TechniqueName { get; set; }
+        public string TechniqueAnnotation { get; set; }
     }
 }

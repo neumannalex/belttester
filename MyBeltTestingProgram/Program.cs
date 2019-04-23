@@ -16,26 +16,22 @@ namespace MyBeltTestingProgram
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            //CreateWebHostBuilder(args).Build().Run();
+            var host = CreateWebHostBuilder(args).Build();
 
-            //var host = CreateWebHostBuilder(args).Build();
+            SeedDb(host);
 
-            //using (var scope = host.Services.CreateScope())
-            //{
-            //    var services = scope.ServiceProvider;
-            //    try
-            //    {
-            //        var context = services.GetRequiredService<MyBeltTestingDBContext>();
-            //        DbInitializer.Initialze(context);
-            //    }
-            //    catch(Exception ex)
-            //    {
-            //        var logger = services.GetRequiredService<ILogger<Program>>();
-            //        logger.LogError(ex, "An error occurred while seeding the database.");
-            //    }
-            //}
+            host.Run();
+        }
 
-            //host.Run();
+        private static void SeedDb(IWebHost host)
+        {
+            var scopeFactory = host.Services.GetService<IServiceScopeFactory>();
+            using (var scope = scopeFactory.CreateScope())
+            {
+                var seeder = scope.ServiceProvider.GetService<DbInitializer>();
+                seeder.InitialzeAsync().Wait();
+            }
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>

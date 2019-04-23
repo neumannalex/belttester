@@ -9,22 +9,17 @@ namespace MyBeltTestingProgram.Data.Models
     public class BeltTestProgram
     {
         public int ID { get; set; }
-        public Graduation Graduation { get; set; }
+        public int Graduation { get; set; }
+        public GraduationType GraduationType { get; set; }
         public string Name { get; set; }
-        public Kihon Kihon { get; set; }
+        public string StyleName { get; set; }
 
-        public override string ToString()
-        {
-            StringBuilder builder = new StringBuilder();
+        public List<Combination> KihonCombinations { get; set; } = new List<Combination>();
+    }
 
-            var header = Graduation.ToString();
-            if (!string.IsNullOrEmpty(Name))
-                header += " " + Name;
-
-            builder.AppendLine(header);
-            builder.Append(Kihon.ToString());
-
-            return builder.ToString();
-        }
+    public enum GraduationType
+    {
+        Kyu,
+        Dan
     }
 }

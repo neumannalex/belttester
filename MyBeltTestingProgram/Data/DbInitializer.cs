@@ -1,4 +1,6 @@
-﻿using MyBeltTestingProgram.Data.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using MyBeltTestingProgram.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,20 +8,46 @@ using System.Threading.Tasks;
 
 namespace MyBeltTestingProgram.Data
 {
-    public static class DbInitializer
+    public class DbInitializer
     {
-        public static void Initialze(MyBeltTestingDBContext context)
-        {
-            context.Database.EnsureCreated();
+        private readonly MyBeltTestingDBContext _context;
+        private readonly UserManager<AppUser> _userManager;
 
-            InitStances(context);
-            InitMoves(context);
-            InitTechniques(context);
+        public DbInitializer(MyBeltTestingDBContext context, UserManager<AppUser> userManager)
+        {
+            _context = context;
+            _userManager = userManager;
         }
 
-        public static void InitStances(MyBeltTestingDBContext context)
+        public async Task InitialzeAsync()
         {
-            if (context.Stances.Any())
+            _context.Database.EnsureCreated();
+
+            await InitUsers();
+            await InitStances();
+            await InitMoves();
+            await InitTechniques();
+            await InitPrograms();
+
+            //await InitFirstKyuProgram();
+        }
+
+        public async Task InitUsers()
+        {
+            AppUser user = await _userManager.FindByEmailAsync("admin@localhost");
+            if (user == null)
+            {
+                user = new AppUser { FirstName = "Alexander", LastName = "Neumann", Email = "admin@localhost", UserName = "admin" };
+
+                var result = await _userManager.CreateAsync(user, "M109a3gh()");
+                if (result != IdentityResult.Success)
+                    throw new InvalidOperationException("Could not create Admin user in Seeding");
+            }
+        }
+
+        public async Task InitStances()
+        {
+            if (await _context.Stances.AnyAsync())
                 return;
 
             var items = new Stance[]
@@ -31,14 +59,14 @@ namespace MyBeltTestingProgram.Data
             };
 
             foreach (var item in items)
-                context.Stances.Add(item);
+                await _context.Stances.AddAsync(item);
 
-            context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public static void InitMoves(MyBeltTestingDBContext context)
+        public async Task InitMoves()
         {
-            if (context.Moves.Any())
+            if (await _context.Moves.AnyAsync())
                 return;
 
             var items = new Move[]
@@ -50,77 +78,89 @@ namespace MyBeltTestingProgram.Data
             };
 
             foreach (var item in items)
-                context.Moves.Add(item);
+                await _context.Moves.AddAsync(item);
 
-            context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public static void InitTechniques(MyBeltTestingDBContext context)
+        public async Task InitTechniques()
         {
-            if (context.Techniques.Any())
+            if (await _context.Techniques.AnyAsync())
                 return;
 
             var items = new Technique[]
             {
                 // Abwehrtechniken
-                new Technique{ Name = "Age-Uke", Annotation = "", Purpose = PurposeType.Defense, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Soto-Ude-Uke", Annotation = "", Purpose = PurposeType.Defense, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Gedan-Barai", Annotation = "", Purpose = PurposeType.Defense, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Shuto-Uke", Annotation = "", Purpose = PurposeType.Defense, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Morote-Uchi-Ude-Uke", Annotation = "", Purpose = PurposeType.Defense, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Gedan-Nagashi-Uke", Annotation = "", Purpose = PurposeType.Defense, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Age-Uke", Level = LevelType.None, Purpose = PurposeType.Defense, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Soto-Ude-Uke", Level = LevelType.None, Purpose = PurposeType.Defense, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Gedan-Barai", Level = LevelType.None, Purpose = PurposeType.Defense, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Shuto-Uke", Level = LevelType.None, Purpose = PurposeType.Defense, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Morote-Uchi-Ude-Uke", Level = LevelType.None, Purpose = PurposeType.Defense, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Gedan-Nagashi-Uke", Level = LevelType.None, Purpose = PurposeType.Defense, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Uchi-Ude-Uke", Level = LevelType.None, Purpose = PurposeType.Defense, Weapon = WeaponType.Arm},
 
                 // Angriff, Fausttechniken
-                new Technique{ Name = "Oi-Zuki", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Oi-Zuki Chudan", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Oi-Zuki Jodan", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Gyaku-Zuki", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Gyaku-Zuki", Annotation = "im Stand", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Ren-Zuki", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Sanbon-Zuki", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Kizami-Zuki", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Kizami-Zuki Jodan", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Yoko-Empi", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Shuto-Uchi Jodan", Annotation = "vorderer Arm", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Shuto-Uchi", Annotation = "von Innen", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Gyaku-Haito-Uchi Jodan", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Uraken-Uchi Jodan", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Oi-Zuki", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Oi-Zuki", Level = LevelType.Chudan, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Oi-Zuki", Level = LevelType.Jodan, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Gyaku-Zuki", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Ren-Zuki", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Sanbon-Zuki", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Kizami-Zuki", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Kizami-Zuki", Level = LevelType.Jodan, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Yoko-Empi", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Shuto-Uchi", Level = LevelType.Jodan, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Shuto-Uchi", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Gyaku-Haito-Uchi", Level = LevelType.Jodan, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Uraken-Uchi", Level = LevelType.Jodan, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
 
-                new Technique{ Name = "Yoko-Uraken Jodan", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Gyaku-Tate-Nukite", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Gyaku-Mae-Empi", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
-                new Technique{ Name = "Gyaku-Shuto-Uchi Jodan", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Yoko-Uraken", Level = LevelType.Jodan, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Gyaku-Tate-Nukite", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Gyaku-Mae-Empi", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
+                new Technique{ Name = "Gyaku-Shuto-Uchi", Level = LevelType.Jodan, Purpose = PurposeType.Attack, Weapon = WeaponType.Arm },
 
                 // Angriff, Fußtechniken
-                new Technique{ Name = "Mae-Geri Chudan", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Mae-Geri Jodan", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Mae-Geri", Annotation = "aus Chudan Kamae", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Mae-Geri", Annotation = "hinten absetzen", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
+                new Technique{ Name = "Mae-Geri", Level = LevelType.Chudan, Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
+                new Technique{ Name = "Mae-Geri", Level = LevelType.Jodan, Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
+                new Technique{ Name = "Mae-Geri", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
                 
-                new Technique{ Name = "Yoko-Geri Kekomi", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Yoko-Geri Kekomi", Annotation = "Drehung", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Yoko-Geri Kekomi", Annotation = "aus der Drehung", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Yoko-Geri Kekomi", Annotation = "vorderes Bein", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Yoko-Geri Keage", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Yoko-Geri Keage", Annotation = "übersetzen", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Yoko-Geri Keage", Annotation = "ohne Absetzen - gleiches Bein", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
+                new Technique{ Name = "Yoko-Geri Kekomi", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
+                new Technique{ Name = "Yoko-Geri Keage", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
 
-                new Technique{ Name = "Mawashi-Geri", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Mae-Mawashi-Geri", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Ura-Mawashi-Geri", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Mae-Ashi-Geri", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Mae-Ashi-Geri", Annotation = "vorderes Bein", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Ashi-Barai", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Ashi-Barai", Annotation = "vorderer Fuß", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
+                new Technique{ Name = "Mawashi-Geri", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
+                new Technique{ Name = "Mae-Mawashi-Geri", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
+                new Technique{ Name = "Mae-Ashi-Geri", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
+                new Technique{ Name = "Ashi-Barai", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
 
-                new Technique{ Name = "Ushiro-Geri", Annotation = "", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
-                new Technique{ Name = "Ushiro-Geri", Annotation = "hinten absetzen", Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
+                new Technique{ Name = "Ushiro-Geri", Level = LevelType.None, Purpose = PurposeType.Attack, Weapon = WeaponType.Leg },
             };
 
             foreach (var item in items)
-                context.Techniques.Add(item);
+                await _context.Techniques.AddAsync(item);
 
-            context.SaveChanges();
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task InitPrograms()
+        {
+            if (await _context.BeltTestPrograms.AnyAsync())
+                return;
+
+            var items = new BeltTestProgram[]
+            {
+                new BeltTestProgram
+                {
+                    Name = "Weißer Gürtel",
+                    Graduation = 9,
+                    GraduationType = GraduationType.Kyu,
+                    StyleName = "Shotokan"
+                }
+            };
+
+            foreach (var item in items)
+                await _context.BeltTestPrograms.AddAsync(item);
+
+            await _context.SaveChangesAsync();
         }
     }
 }

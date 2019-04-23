@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
 using MyBeltTestingProgram.Data.Models;
 using MyBeltTestingProgram.Entities.Combination;
+using MyBeltTestingProgram.Entities.Motion;
 using MyBeltTestingProgram.Entities.Move;
 using MyBeltTestingProgram.Entities.Stance;
 using MyBeltTestingProgram.Entities.Technique;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MyBeltTestingProgram.Data
 {
@@ -26,6 +23,8 @@ namespace MyBeltTestingProgram.Data
             CreateMap<Technique, TechniqueDTO>().ReverseMap();
             CreateMap<Technique, TechniqueDTOForCreation>().ReverseMap();
             CreateMap<Technique, TechniqueDTOForUpdate>().ReverseMap();
+
+            CreateMap<Motion, MotionDTO>().ReverseMap();
 
             CreateMap<Combination, CombinationDTO>().ReverseMap();
         }

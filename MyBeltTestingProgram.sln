@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyBeltTestingProgram", "MyB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{6A08DBD1-8845-43CA-91CF-DB5B063C6DB2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeltTester", "BeltTester\BeltTester.csproj", "{2E8D4907-EB5E-48BD-96E0-E657FDDC2771}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{6A08DBD1-8845-43CA-91CF-DB5B063C6DB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A08DBD1-8845-43CA-91CF-DB5B063C6DB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A08DBD1-8845-43CA-91CF-DB5B063C6DB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E8D4907-EB5E-48BD-96E0-E657FDDC2771}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E8D4907-EB5E-48BD-96E0-E657FDDC2771}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E8D4907-EB5E-48BD-96E0-E657FDDC2771}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E8D4907-EB5E-48BD-96E0-E657FDDC2771}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

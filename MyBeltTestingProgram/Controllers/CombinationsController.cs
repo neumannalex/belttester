@@ -37,64 +37,39 @@ namespace MyBeltTestingProgram.Controllers
             _pagingLinkCreator = pagingLinkCreator;
         }
 
-
         [HttpGet(Name = "GetCombinations")]
-        public async Task<ActionResult<IEnumerable<CombinationDTO>>> Test([FromQuery]SieveModel sieveModel)
+        public async Task<ActionResult<IEnumerable<CombinationDTO>>> GetCombinations([FromQuery]SieveModel sieveModel)
         {
             _sieveModelPreparer.SetMissingValues(ref sieveModel);
 
-            var itemsFromRepo = await _repository.GetCombinations(sieveModel);
-
-            var previousPageLink = itemsFromRepo.HasPrevious ? _pagingLinkCreator.CreatePreviousPageLink("GetCombinations", sieveModel) : null;
-            var nextPageLink = itemsFromRepo.HasNext ? _pagingLinkCreator.CreateNextPageLink("GetCombinations", sieveModel) : null;
-
-            var paginationMetadata = new PaginationMetadata
+            try
             {
-                TotalCount = itemsFromRepo.TotalCount,
-                PageSize = itemsFromRepo.PageSize,
-                CurrentPage = itemsFromRepo.CurrentPage,
-                TotalPages = itemsFromRepo.TotalPages,
-                PreviousPageLink = previousPageLink,
-                NextPageLink = nextPageLink
-            };
+                var itemsFromRepo = await _repository.GetCombinations(sieveModel);
 
-            Response.Headers.Add("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
+                var previousPageLink = itemsFromRepo.HasPrevious ? _pagingLinkCreator.CreatePreviousPageLink("GetCombinations", sieveModel) : null;
+                var nextPageLink = itemsFromRepo.HasNext ? _pagingLinkCreator.CreateNextPageLink("GetCombinations", sieveModel) : null;
 
-            var items = _mapper.Map<List<CombinationDTO>>(itemsFromRepo);
-            return Ok(items);
+                var paginationMetadata = new PaginationMetadata
+                {
+                    TotalCount = itemsFromRepo.TotalCount,
+                    PageSize = itemsFromRepo.PageSize,
+                    CurrentPage = itemsFromRepo.CurrentPage,
+                    TotalPages = itemsFromRepo.TotalPages,
+                    PreviousPageLink = previousPageLink,
+                    NextPageLink = nextPageLink
+                };
+
+                Response.Headers.Add("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
+
+                var items = _mapper.Map<List<CombinationDTO>>(itemsFromRepo);
+                return Ok(items);
+            }
+            catch(RepositoryFilterException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // GET: api/Combinations
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<CombinationDTO>>> GetCombinations([FromQuery]QueryResourceParameters parameters)
-        //{
-        //    var itemsFromRepo = await _repository.GetCombinations(parameters);
-
-        //    var previousPageLink = itemsFromRepo.HasPrevious ?
-        //        CreateCombinationsResourceUri(parameters,
-        //        ResourceUriType.PreviousPage) : null;
-
-        //    var nextPageLink = itemsFromRepo.HasNext ?
-        //        CreateCombinationsResourceUri(parameters,
-        //        ResourceUriType.NextPage) : null;
-
-        //    var paginationMetadata = new PaginationMetadata
-        //    {
-        //        TotalCount = itemsFromRepo.TotalCount,
-        //        PageSize = itemsFromRepo.PageSize,
-        //        CurrentPage = itemsFromRepo.CurrentPage,
-        //        TotalPages = itemsFromRepo.TotalPages,
-        //        PreviousPageLink = previousPageLink,
-        //        NextPageLink = nextPageLink
-        //    };
-
-        //    Response.Headers.Add("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
-
-        //    var items = _mapper.Map<List<CombinationDTO>>(itemsFromRepo);
-        //    return Ok(items);
-        //}
-
-        // GET: api/Combinations/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CombinationDTO>> GetCombination(int id)
         {
@@ -112,7 +87,6 @@ namespace MyBeltTestingProgram.Controllers
             return Ok(_mapper.Map<CombinationDTO>(combination));
         }
 
-        // GET: api/Combinations/5
         [HttpGet("{id}/pretty")]
         public async Task<ActionResult<string>> GetPrettyCombination(int id)
         {
@@ -130,7 +104,6 @@ namespace MyBeltTestingProgram.Controllers
             return Ok(combination.ToString());
         }
 
-        // PUT: api/Combinations/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCombination(int id, Combination combination)
         {
@@ -160,23 +133,133 @@ namespace MyBeltTestingProgram.Controllers
             return NoContent();
         }
 
-        // POST: api/Combinations
         [HttpPost]
-        public async Task<ActionResult<CombinationDTO>> PostCombination(CombinationDTOForCreation combinationForCreation)
+        public async Task<ActionResult<CombinationDTO>> PostCombination(CombinationDTO itemForCreation)
         {
-            if (combinationForCreation.Motions.Count <= 0)
+            if (itemForCreation == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return new UnprocessableEntityObjectResult(ModelState);
+
+            if (itemForCreation.Motions.Count <= 0)
                 return BadRequest("No motions given for combination.");
+
+            var item = _mapper.Map<Combination>(itemForCreation);
 
             Combination combination = new Combination();
 
-            foreach (var motion in combinationForCreation.Motions)
+            foreach (var motion in item.Motions)
             {
-                var stance = await _context.Stances.Where(x => x.ID == motion.StanceId).FirstOrDefaultAsync();
-                var move = await _context.Moves.Where(x => x.ID == motion.MoveId).FirstOrDefaultAsync();
-                var technique = await _context.Techniques.Where(x => x.ID == motion.TechniqueId).FirstOrDefaultAsync();
+                Stance stance;
+                if (motion.Stance.ID > 0)
+                    stance = await _repository.GetStance(motion.Stance.ID);
+                else
+                    stance = await _repository.GetStance(_mapper.Map<Stance>(motion.Stance));
+
+                if (stance == null)
+                    stance = await _repository.AddStance(stance);
+
+                Move move;
+                if (motion.Move.ID > 0)
+                    move = await _repository.GetMove(motion.Move.ID);
+                else
+                    move = await _repository.GetMove(_mapper.Map<Move>(motion.Move));
+
+                if (move == null)
+                    move = await _repository.AddMove(move);
+
+                Technique technique;
+                if (motion.Technique.ID > 0)
+                    technique = await _repository.GetTechnique(motion.Technique.ID);
+                else
+                    technique = await _repository.GetTechnique(_mapper.Map<Technique>(motion.Technique));
+
+                if (technique == null)
+                    technique = await _repository.AddTechnique(technique);
 
                 if (stance == null || move == null || technique == null)
                     return BadRequest("Motion specified incorrect.");
+
+                motion.Stance = stance;
+                motion.Move = move;
+                motion.Technique = technique;
+            }
+
+            combination = await _repository.AddCombination(item);
+            if(combination == null)
+                return BadRequest("Combination already exists.");
+            else
+                return CreatedAtAction("GetCombination", new { id = combination.ID }, _mapper.Map<CombinationDTO>(combination));
+        }
+
+        [HttpPost("create")]
+        public async Task<ActionResult<CombinationDTO>> CreateCombination(CombinationDTOForCreation itemForCreation)
+        {
+            if (itemForCreation == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return new UnprocessableEntityObjectResult(ModelState);
+
+            if (itemForCreation.Motions.Count <= 0)
+                return BadRequest("No motions given for combination.");
+
+
+            var combination = new Combination();
+
+            foreach (var motion in itemForCreation.Motions)
+            {
+                var stance = await _repository.GetStanceBySymbol(motion.StanceSymbol);
+                var move = await _repository.GetMoveBySymbol(motion.MoveSymbol);
+                var technique = (await _repository.GetTechniquesByName(motion.TechniqueName)).FirstOrDefault();
+
+                if (stance == null || move == null || technique == null)
+                    return BadRequest("Stance, Move or Technique not found.");
+
+                combination.Motions.Add(new Motion {
+                    Stance = stance,
+                    Move = move,
+                    Technique = technique
+                });
+            }
+
+            try
+            {
+                combination = await _repository.AddCombination(combination);
+                if (combination == null)
+                    return BadRequest("Error saving Combination.");
+                else
+                    return CreatedAtAction("GetCombination", new { id = combination.ID }, _mapper.Map<CombinationDTO>(combination));
+            }
+            catch(RepositoryItemAlreadyExistsException)
+            {
+                return BadRequest("Combination already exists.");
+            }
+        }
+
+        [HttpPost("createwithids")]
+        public async Task<ActionResult<CombinationDTO>> CreateCombinationWithIds(CombinationDTOForCreationWithIds itemForCreation)
+        {
+            if (itemForCreation == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return new UnprocessableEntityObjectResult(ModelState);
+
+            if (itemForCreation.Motions.Count <= 0)
+                return BadRequest("No motions given for combination.");
+
+            var combination = new Combination();
+
+            foreach (var motion in itemForCreation.Motions)
+            {
+                var stance = await _repository.GetStance(motion.StanceId);
+                var move = await _repository.GetMove(motion.MoveId);
+                var technique = await _repository.GetTechnique(motion.TechniqueId);
+
+                if (stance == null || move == null || technique == null)
+                    return BadRequest("Stance, Move or Technique not found.");
 
                 combination.Motions.Add(new Motion
                 {
@@ -186,13 +269,20 @@ namespace MyBeltTestingProgram.Controllers
                 });
             }
 
-            _context.Combinations.Add(combination);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCombination", new { id = combination.ID }, _mapper.Map<CombinationDTO>(combination));
+            try
+            {
+                combination = await _repository.AddCombination(combination);
+                if (combination == null)
+                    return BadRequest("Error saving Combination.");
+                else
+                    return CreatedAtAction("GetCombination", new { id = combination.ID }, _mapper.Map<CombinationDTO>(combination));
+            }
+            catch (RepositoryItemAlreadyExistsException)
+            {
+                return BadRequest("Combination already exists.");
+            }
         }
 
-        // DELETE: api/Combinations/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Combination>> DeleteCombination(int id)
         {

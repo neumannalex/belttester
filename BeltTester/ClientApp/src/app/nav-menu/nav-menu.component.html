@@ -1,0 +1,39 @@
+<header>
+  <nav class='navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3'>
+    <div class="container">
+      <a class="navbar-brand" [routerLink]='["/"]'>BeltTester</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-label="Toggle navigation"
+        [attr.aria-expanded]="isExpanded" (click)="toggle()">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse" [ngClass]='{"show": isExpanded}'>
+        <ul class="navbar-nav flex-grow">
+          <li class="nav-item" [routerLinkActive]='["link-active"]' [routerLinkActiveOptions]='{ exact: true }'>
+            <a class="nav-link text-dark" [routerLink]='["/"]'>Home</a>
+          </li>
+          <li class="nav-item" [routerLinkActive]='["link-active"]'>
+            <a class="nav-link text-dark" [routerLink]='["/counter"]'>Counter</a>
+          </li>
+          <li class="nav-item" [routerLinkActive]='["link-active"]'>
+            <a class="nav-link text-dark" [routerLink]='["/fetch-data"]'>Fetch data</a>
+          </li>
+          <li ngbDropdown class="nav-item" [routerLinkActive]='["link-active"]'>
+            <a ngbDropdownToggle class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Datenbank</a>
+            <div ngbDropdownMenu aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" [routerLink]='["/stances"]'>Stände</a>
+              <a class="dropdown-item" [routerLink]='["/moves"]'>Schritte</a>
+              <a class="dropdown-item" [routerLink]='["/techniques"]'>Techniken</a>
+              <a class="dropdown-item" [routerLink]='["/motions"]'>Bewegungen</a>
+              <a class="dropdown-item" [routerLink]='["/combinations"]'>Kombinationen</a>
+              <a class="dropdown-item" [routerLink]='["/programs"]'>Prüfungsprogramme</a>
+            </div>
+          </li>
+
+          <li class="nav-item" [routerLinkActive]='["link-active"]'>
+            <a class="nav-link text-dark" href="/swagger/index.html" target="_blank">Swagger</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>

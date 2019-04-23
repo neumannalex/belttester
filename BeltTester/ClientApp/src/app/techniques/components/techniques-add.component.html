@@ -1,0 +1,35 @@
+<div>
+  <form [formGroup]="techniqueForm" (ngSubmit)="saveTechnique(techniqueForm.value)" novalidate>
+    <div class="form-group">
+      <label for="technique-name">Name</label>
+      <input type="text" class="form-control" formControlName="name" id="technique-name" placeholder="e. g. Oi-Zuki" />
+    </div>
+    <div class="form-group">
+      <label for="technique-level">Level</label>
+      <select class="custom-select" formControlName="level" id="technique-level">
+        <option value="None" selected>None</option>
+        <option value="Jodan">Jodan</option>
+        <option value="Chudan">Chudan</option>
+        <option value="Gedan">Gedan</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="technique-weapon">Weapon</label>
+      <select class="custom-select" formControlName="weapon" id="technique-weapon">
+        <option value="None" selected>None</option>
+        <option value="Arm">Arm</option>
+        <option value="Leg">Leg</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="technique-purpose">Purpose</label>
+      <select class="custom-select" formControlName="purpose" id="technique-purpose">
+        <option value="None" selected>None</option>
+        <option value="Attack">Attack</option>
+        <option value="Defense">Defense</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-default" (click)="cancel(eventForm)">Cancel</button>
+  </form>
+</div>

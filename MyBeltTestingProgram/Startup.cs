@@ -1,20 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MyBeltTestingProgram.Data;
+using MyBeltTestingProgram.Data.Models;
 using MyBeltTestingProgram.Data.Repositories;
 using MyBeltTestingProgram.Services;
 using Sieve.Models;
@@ -34,8 +41,29 @@ namespace MyBeltTestingProgram
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<MyBeltTestingProgram.Data.MyBeltTestingDBContext>(options =>
+            services.AddIdentity<AppUser, IdentityRole>(cfg =>
+            {
+                cfg.User.RequireUniqueEmail = true;
+            })
+                .AddEntityFrameworkStores<MyBeltTestingDBContext>();
+
+            services.AddAuthentication()
+                .AddCookie()
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidIssuer = Configuration["Tokens:Issuer"],
+                        ValidAudience = Configuration["Tokens:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Tokens:Key"]))
+                    };
+
+                });
+
+            services.AddDbContext<MyBeltTestingDBContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddTransient<DbInitializer>();
 
             services.Configure<SieveOptions>(Configuration.GetSection("Sieve"));
             services.AddScoped<ISieveCustomSortMethods, SieveCustomSortMethods>();
@@ -65,6 +93,23 @@ namespace MyBeltTestingProgram
                         Title = "Belt Testing Program API",
                         Version = "1"
                     });
+                options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                {
+                    Description = "Standard Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                    Name = "Authorization",
+                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey
+                });
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = JwtBearerDefaults.AuthenticationScheme }
+                        }
+                        , new[] { "readAccess", "writeAccess" }
+                    }
+                });
             });
 
             services.AddMvc()
@@ -84,7 +129,7 @@ namespace MyBeltTestingProgram
             }
             else
             {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
 
@@ -106,6 +151,8 @@ namespace MyBeltTestingProgram
             });
 
             app.UseStaticFiles();
+
+            app.UseAuthentication();
 
             app.UseMvc();
         }
