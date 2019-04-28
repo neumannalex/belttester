@@ -4,6 +4,8 @@ using BeltTester.Data.Entities;
 using BeltTester.DTO;
 using BeltTester.Helpers;
 using BeltTester.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
@@ -93,6 +95,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TechniqueDTO>> PutTechnique(int id, [FromBody]TechniqueDTOForUpdate itemForUpdate)
         {
             var item = _mapper.Map<Technique>(itemForUpdate);
@@ -117,6 +120,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPatch("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TechniqueDTO>> PatchTechnique(int id, [FromBody]JsonPatchDocument<TechniqueDTOForUpdate> itemPatch)
         {
             var item = await _repository.GetTechnique(id);
@@ -151,6 +155,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TechniqueDTO>> PostTechnique([FromBody]TechniqueDTOForCreation itemForCreation)
         {
             if (itemForCreation == null)
@@ -176,6 +181,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteTechnique(int id)
         {
             try

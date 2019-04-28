@@ -46,5 +46,13 @@ namespace BeltTester.Data
         Task<PagedList<Combination>> GetCombinations(SieveModel sieveModel);
         Task<Combination> AddCombination(Combination combination);
         Task<bool> DeleteCombination(int id);
+
+        Task<bool> BeltTestProgramExists(int id);
+        Task<BeltTestProgram> GetBeltTestProgram(int id);
+        Task<BeltTestProgram> GetBeltTestProgram(BeltTestProgram program);
+        Task<List<BeltTestProgram>> GetAllBeltTestPrograms();
+        Task<PagedList<BeltTestProgram>> GetBeltTestPrograms(SieveModel sieveModel);
+        Task<BeltTestProgram> AddBeltTestProgram(BeltTestProgram program);
+        Task<bool> DeleteBeltTestProgram(int id);
     }
 }

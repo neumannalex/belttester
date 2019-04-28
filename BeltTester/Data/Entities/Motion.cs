@@ -24,5 +24,14 @@ namespace BeltTester.Data.Entities
         public Technique Technique { get; set; }
 
         public string Annotation { get; set; }
+
+        public override string ToString()
+        {
+            string annotation = string.Empty;
+            if (!string.IsNullOrEmpty(Annotation))
+                annotation = $" ({Annotation})";
+
+            return $"{Stance.Symbol} {Move.Symbol} {Technique.Name}{annotation}";
+        }
     }
 }

@@ -13,21 +13,23 @@ namespace BeltTester.Services
 
         public EntityMappings()
         {
-            //CreateMap<Stance, StanceDTO>().ReverseMap();
-            //CreateMap<Stance, StanceDTOForCreation>().ReverseMap();
-            //CreateMap<Stance, StanceDTOForUpdate>().ReverseMap();
+            CreateMap<Stance, StanceDTO>().ReverseMap();
+            CreateMap<Stance, StanceDTOForCreation>().ReverseMap();
+            CreateMap<Stance, StanceDTOForUpdate>().ReverseMap();
 
-            //CreateMap<Move, MoveDTO>().ReverseMap();
-            //CreateMap<Move, MoveDTOForCreation>().ReverseMap();
-            //CreateMap<Move, MoveDTOForUpdate>().ReverseMap();
+            CreateMap<Move, MoveDTO>().ReverseMap();
+            CreateMap<Move, MoveDTOForCreation>().ReverseMap();
+            CreateMap<Move, MoveDTOForUpdate>().ReverseMap();
 
             CreateMap<Technique, TechniqueDTO>().ReverseMap();
             CreateMap<Technique, TechniqueDTOForCreation>().ReverseMap();
             CreateMap<Technique, TechniqueDTOForUpdate>().ReverseMap();
 
-            //CreateMap<Motion, MotionDTO>().ReverseMap();
+            CreateMap<Motion, MotionDTO>().ReverseMap();
 
-            //CreateMap<Combination, CombinationDTO>().ReverseMap();
+            CreateMap<Combination, CombinationDTO>().ReverseMap();
+
+            CreateMap<BeltTestProgram, BeltTestProgramDTO>().ReverseMap();
         }
     }
 }

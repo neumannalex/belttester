@@ -1,0 +1,60 @@
+<mat-card class="form-card">
+  <mat-card-header>
+    <mat-card-title>Neue Technik anlegen</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+
+    <div class="container" novalidate>
+      <form [formGroup]="formGroup" (ngSubmit)="save(formGroup.value)" class="form">
+
+        <mat-form-field class="form-element">
+          <input matInput placeholder="Name" [formControl]="name">
+          <mat-error *ngIf="!name.valid && name.touched">
+            Für die Technik muss ein Name vergeben werden
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="form-element">
+          <mat-select placeholder="Stufe der Technik auswählen" [formControl]="level">
+            <mat-option value="None" selected>Keine Stufe</mat-option>
+            <mat-option value="Jodan">Jodan</mat-option>
+            <mat-option value="Chudan">Chudan</mat-option>
+            <mat-option value="Gedan">Gedan</mat-option>
+          </mat-select>
+          <mat-error *ngIf="!level.valid && level.touched">
+            Für die Technik muss eine Stufe angegeben werden
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="form-element">
+          <mat-select placeholder="Waffe der Technik auswählen" [formControl]="weapon">
+            <mat-option value="None" selected>Keine Waffe</mat-option>
+            <mat-option value="Arm">Arm</mat-option>
+            <mat-option value="Leg">Bein</mat-option>
+          </mat-select>
+          <mat-error *ngIf="!weapon.valid && weapon.touched">
+            Für die Technik muss eine Waffe angegeben werden
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="form-element">
+          <mat-select placeholder="Zweck der Technik auswählen" [formControl]="purpose">
+            <mat-option value="None" selected>Kein Zweck</mat-option>
+            <mat-option value="Attack">Angriff</mat-option>
+            <mat-option value="Defense">Verteidigung</mat-option>
+          </mat-select>
+          <mat-error *ngIf="!purpose.valid && purpose.touched">
+            Für die Technik muss ein Zweck angegeben werden
+          </mat-error>
+        </mat-form-field>
+
+        <div>
+          <button mat-raised-button color="primary" type="submit" class="button" [disabled]="!formGroup.valid">Speichern</button>
+          <button mat-raised-button type="button" class="button" (click)="cancel()">Abbrechen</button>
+        </div>
+
+      </form>
+    </div>
+
+  </mat-card-content>
+</mat-card>

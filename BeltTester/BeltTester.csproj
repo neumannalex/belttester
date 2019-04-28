@@ -17,6 +17,7 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
     <PackageReference Include="Sieve" Version="2.3.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc2" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.12" />
@@ -30,11 +31,36 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="ClientApp\src\app\techniques\components\techniques-add.component.ts" />
+    <None Remove="ClientApp\src\app\app.routing.ts" />
+    <None Remove="ClientApp\src\app\common\ok-cancel-dialog.component.ts" />
+    <None Remove="ClientApp\src\app\common\yes-no-dialog.component.ts" />
+    <None Remove="ClientApp\src\app\login\login.component.ts" />
+    <None Remove="ClientApp\src\app\moves\moves-add.component.ts" />
+    <None Remove="ClientApp\src\app\moves\moves-list.component.ts" />
+    <None Remove="ClientApp\src\app\profile\profile-menu.component.ts" />
+    <None Remove="ClientApp\src\app\programs\programs-list.component.ts" />
+    <None Remove="ClientApp\src\app\stances\stances-add.component.ts" />
+    <None Remove="ClientApp\src\app\stances\stances-list.component.ts" />
     <None Remove="ClientApp\src\app\techniques\sortable.directive.ts" />
     <None Remove="ClientApp\src\app\techniques\technique.ts" />
+    <None Remove="ClientApp\src\app\techniques\techniques-add.component.ts" />
+    <None Remove="ClientApp\src\app\techniques\techniques-list.component.ts" />
     <None Remove="ClientApp\src\app\techniques\techniques.component.ts" />
     <None Remove="ClientApp\src\app\techniques\techniques.service.ts" />
+    <None Remove="ClientApp\src\app\_guards\auth.guard.ts" />
+    <None Remove="ClientApp\src\app\_guards\index.ts" />
+    <None Remove="ClientApp\src\app\_interceptors\index.ts" />
+    <None Remove="ClientApp\src\app\_interceptors\jwt.interceptor.ts" />
+    <None Remove="ClientApp\src\app\_models\authenticationParameters.ts" />
+    <None Remove="ClientApp\src\app\_models\index.ts" />
+    <None Remove="ClientApp\src\app\_models\move.ts" />
+    <None Remove="ClientApp\src\app\_models\program.ts" />
+    <None Remove="ClientApp\src\app\_models\stance.ts" />
+    <None Remove="ClientApp\src\app\_models\technique.ts" />
+    <None Remove="ClientApp\src\app\_models\user.ts" />
+    <None Remove="ClientApp\src\app\_services\authentication.service.ts" />
+    <None Remove="ClientApp\src\app\_services\data.service.ts" />
+    <None Remove="ClientApp\src\app\_services\index.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,11 +68,33 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\app.routing.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\common\ok-cancel-dialog.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\common\yes-no-dialog.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\directives\sortable.directive.ts" />
-    <TypeScriptCompile Include="ClientApp\src\app\techniques\components\techniques-add.component.ts" />
-    <TypeScriptCompile Include="ClientApp\src\app\techniques\interfaces\technique.ts" />
-    <TypeScriptCompile Include="ClientApp\src\app\techniques\components\techniques-list.component.ts" />
-    <TypeScriptCompile Include="ClientApp\src\app\techniques\services\techniques.service.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\login\login.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\moves\moves-list.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\moves\moves-add.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\profile\profile-menu.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\programs\programs-list.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\stances\stances-list.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\stances\stances-add.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\techniques\techniques-add.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\techniques\techniques-list.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_guards\auth.guard.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_guards\index.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_interceptors\index.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_interceptors\jwt.interceptor.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_models\authenticationParameters.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_models\index.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_models\move.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_models\program.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_models\stance.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_models\technique.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_models\user.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_services\authentication.service.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_services\index.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_services\data.service.ts" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

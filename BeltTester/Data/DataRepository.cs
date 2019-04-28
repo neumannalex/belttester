@@ -475,5 +475,180 @@ namespace BeltTester.Data
             return (await _context.SaveChangesAsync() >= 0);
         }
         #endregion
+
+        #region BeltTestPrograms
+        public async Task<bool> BeltTestProgramExists(int id)
+        {
+            return await _context.BeltTestPrograms.AnyAsync(x => x.ID == id);
+        }
+
+        public async Task<BeltTestProgram> GetBeltTestProgram(int id)
+        {
+            var item = await _context.BeltTestPrograms.Where(x => x.ID == id)
+                .Include(x => x.KihonCombinations)
+                .Include("Combination")
+                .Include("Motion")
+                .Include("Motions.Stance")
+                .Include("Motions.Move")
+                .Include("Motions.Technique")
+                .FirstOrDefaultAsync();
+
+            if (item == null)
+                return null;
+
+            return item;
+        }
+
+        public async Task<BeltTestProgram> GetBeltTestProgram(BeltTestProgram program)
+        {
+            var item = await _context.BeltTestPrograms.Where(x => x.Name.ToLowerInvariant() == program.Name.ToLowerInvariant() &&
+                                                       x.StyleName.ToLowerInvariant() == program.StyleName.ToLowerInvariant() &&
+                                                       x.Graduation == program.Graduation &&
+                                                       x.GraduationType == program.GraduationType
+                                                       ).FirstOrDefaultAsync();
+
+            return item;
+        }
+
+        public async Task<List<BeltTestProgram>> GetAllBeltTestPrograms()
+        {
+            var items = _context.BeltTestPrograms
+                .Include(x => x.KihonCombinations)
+                .Include("KihonCombinations.Motions")
+                .Include("KihonCombinations.Motions.Stance")
+                .Include("KihonCombinations.Motions.Move")
+                .Include("KihonCombinations.Motions.Technique")
+                .OrderBy(x => x.ID)
+                .AsQueryable();
+
+            return await items.ToListAsync();
+        }
+
+        public async Task<PagedList<BeltTestProgram>> GetBeltTestPrograms(SieveModel sieveModel)
+        {
+            // TODO: der Filter und das sortieren ist nicht komplett implementiert
+
+            try
+            {
+                if (sieveModel.Filters != null && sieveModel.Filters.Length > 0)
+                {
+                    var motions = _context.Motions
+                        .Include("Stance")
+                        .Include("Move")
+                        .Include("Technique")
+                        .AsQueryable();
+
+                    var filteredMotions = _sieveProcessor.Apply(sieveModel, motions, applyPagination: false);
+                    var comboIds = filteredMotions.Select(x => x.CombinationId).Distinct().ToList();
+
+                    var combos = _context.Combinations
+                                        .Include(x => x.Motions)
+                                        .Include("Motions.Stance")
+                                        .Include("Motions.Move")
+                                        .Include("Motions.Technique")
+                                        .Where(x => comboIds.Contains(x.ID))
+                                        .OrderBy(x => x.ID)
+                                        .AsQueryable();
+
+                    var programIds = combos.Select(x => x.ProgramId).Distinct().ToList();
+
+                    var programs = _context.BeltTestPrograms
+                                        .Include(x => x.KihonCombinations)
+                                        .Include("KihonCombinations.Motions")
+                                        .Include("KihonCombinations.Motions.Stance")
+                                        .Include("KihonCombinations.Motions.Move")
+                                        .Include("KihonCombinations.Motions.Technique")
+                                        .Where(x => programIds.Contains(x.ID))
+                                        .OrderBy(x => x.ID)
+                                        .AsQueryable();
+                    
+
+                    return await PagedList<BeltTestProgram>.Create(programs, sieveModel.Page.Value, sieveModel.PageSize.Value);
+                }
+                else
+                {
+                    var programs = _context.BeltTestPrograms
+                                        .Include(x => x.KihonCombinations)
+                                        .Include("KihonCombinations.Motions")
+                                        .Include("KihonCombinations.Motions.Stance")
+                                        .Include("KihonCombinations.Motions.Move")
+                                        .Include("KihonCombinations.Motions.Technique")
+                                        .OrderBy(x => x.ID)
+                                        .AsQueryable();
+
+                    return await PagedList<BeltTestProgram>.Create(programs, sieveModel.Page.Value, sieveModel.PageSize.Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new RepositoryFilterException(ex.Message);
+            }
+        }
+
+        public async Task<BeltTestProgram> AddBeltTestProgram(BeltTestProgram program)
+        {
+            var existingItem = await GetBeltTestProgram(program);
+
+            if (existingItem != null)
+                throw new RepositoryItemAlreadyExistsException();
+
+
+            foreach (var combination in program.KihonCombinations)
+            {
+                foreach (var motion in combination.Motions)
+                {
+                    Stance stance;
+                    Move move;
+                    Technique technique;
+
+                    if (motion.StanceId > 0)
+                        stance = await GetStance(motion.StanceId);
+                    else
+                        stance = await GetStance(motion.Stance);
+
+                    if (motion.MoveId > 0)
+                        move = await GetMove(motion.MoveId);
+                    else
+                        move = await GetMove(motion.Move);
+
+                    if (motion.TechniqueId > 0)
+                        technique = await GetTechnique(motion.TechniqueId);
+                    else
+                        technique = await GetTechnique(motion.Technique);
+
+                    if (stance == null || move == null || technique == null)
+                    {
+                        string message = $"Invalid motion with SequenceNumber { motion.SequenceNumber}.\n";
+                        message += stance == null ? "Stance is null\n" : "Stance is okay\n";
+                        message += move == null ? "Move is null\n" : "Move is okay\n";
+                        message += technique == null ? "Technique is null\n" : "Technique is okay\n";
+
+                        throw new Exception(message);
+                    }
+
+                    motion.StanceId = stance.ID;
+                    motion.MoveId = move.ID;
+                    motion.TechniqueId = technique.ID;
+                }
+            }
+
+            _context.BeltTestPrograms.Add(program);
+
+            if (await _context.SaveChangesAsync() >= 0)
+                return program;
+            else
+                return null;
+        }
+
+        public async Task<bool> DeleteBeltTestProgram(int id)
+        {
+            var item = await GetBeltTestProgram(id);
+            if (item == null)
+                throw new RepositoryItemNotFoundException();
+
+            _context.BeltTestPrograms.Remove(item);
+            return (await _context.SaveChangesAsync() >= 0);
+        }
+        #endregion
     }
 }
