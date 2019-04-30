@@ -49,13 +49,18 @@ namespace BeltTester.Controllers
                 return Unauthorized();
             }
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
+                new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
+                new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email)
             };
 
+            var roles = await _userManager.GetRolesAsync(user);
+            claims.AddRange(roles.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

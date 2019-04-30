@@ -15,6 +15,14 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
+    "BeltTester Production": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      },
+      "applicationUrl": "http://belttester.azurewebsites.net/"
+    },
     "BeltTester": {
       "commandName": "Project",
       "launchBrowser": true,

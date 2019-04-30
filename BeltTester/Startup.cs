@@ -18,6 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Sieve.Models;
 using Sieve.Services;
+using System;
 using System.Text;
 
 namespace BeltTester
@@ -27,6 +28,12 @@ namespace BeltTester
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            Console.WriteLine("Configuration: ");
+            foreach(var setting in Configuration.AsEnumerable())
+            {
+                Console.WriteLine($"{setting.Key}: {setting.Value}");
+            }
         }
 
         public IConfiguration Configuration { get; }
@@ -53,8 +60,26 @@ namespace BeltTester
 
                 });
 
-            services.AddDbContext<BeltTesterDBContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            // Use SQL Database if in Azure, otherwise, use local DB
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+            {
+                Console.WriteLine("Creating BeltTesterDBContext in Production Environment");
+                Console.WriteLine("Connectionstring: " + Configuration.GetConnectionString("MYSQLCONNSTR_localdb"));
+                
+                services.AddDbContext<BeltTesterDBContext>(options =>
+                        options.UseSqlServer(Configuration.GetConnectionString("MYSQLCONNSTR_localdb")));
+            }
+            else
+            {
+                Console.WriteLine("Creating BeltTesterDBContext in Development Environment");
+                Console.WriteLine("Connectionstring: " + Configuration.GetConnectionString("MYSQLCONNSTR_localdb"));
+
+                services.AddDbContext<BeltTesterDBContext>(options =>
+                        options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            }
+
+            // Automatically perform database migration
+            services.BuildServiceProvider().GetService<BeltTesterDBContext>().Database.Migrate();
 
             services.AddTransient<DbInitializer>();
 

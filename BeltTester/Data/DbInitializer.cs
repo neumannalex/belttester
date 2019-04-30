@@ -1,6 +1,8 @@
 ﻿using BeltTester.Data.Entities;
+using BeltTester.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,35 +13,106 @@ namespace BeltTester.Data
     public class DbInitializer
     {
         private readonly BeltTesterDBContext _context;
+        private readonly IConfiguration _configuration;
         private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public DbInitializer(BeltTesterDBContext context, UserManager<AppUser> userManager)
+        public DbInitializer(BeltTesterDBContext context, IConfiguration configuration, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            _configuration = configuration;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task InitialzeAsync()
         {
             _context.Database.EnsureCreated();
 
+            await InitRoles();
             await InitUsers();
             await InitStances();
             await InitMoves();
             await InitTechniques();
-            await InitPrograms();
+            InitPrograms();
+        }
+
+        public async Task InitRoles()
+        {
+            string[] roleNames = { UserRoleName.Admin, UserRoleName.Manager, UserRoleName.Member };
+
+            foreach(var role in roleNames)
+            {
+                var roleExists = await _roleManager.RoleExistsAsync(role);
+                if(!roleExists)
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(role));
+                }
+            }
         }
 
         public async Task InitUsers()
         {
-            AppUser user = await _userManager.FindByEmailAsync("admin@localhost");
+            var adminSettings = _configuration.GetSection("AdminUser");
+
+            if (adminSettings == null)
+                throw new KeyNotFoundException("AdminUser is appsettings.json not found.");
+
+            var firstname = adminSettings.GetValue<string>("Firstname", "Admin");
+            var lastname = adminSettings.GetValue<string>("Lastname", "Admin");
+            var email = adminSettings.GetValue<string>("Email", "admin@localhost");
+            var password = adminSettings.GetValue<string>("Password", "Qaywsx12()");
+
+            AppUser admin = await _userManager.FindByEmailAsync(email);
+            if (admin == null)
+            {
+                admin = new AppUser { FirstName = firstname, LastName = lastname, Email = email, UserName = email };
+
+                var result = await _userManager.CreateAsync(admin, password);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRolesAsync(admin, new string[] { UserRoleName.Admin, UserRoleName.Manager, UserRoleName.Member });
+                }
+                else
+                {
+                    throw new InvalidOperationException("Could not create Admin user in Seeding");
+                }
+            }
+
+            var managerEmail = "manager@localhost";
+            var managerPassword = "Qaywsx12()";
+            AppUser manager = await _userManager.FindByEmailAsync(managerEmail);
+            if (manager == null)
+            {
+                manager = new AppUser { FirstName = "Manager", LastName = "Manager", Email = managerEmail, UserName = managerEmail };
+
+                var result = await _userManager.CreateAsync(manager, managerPassword);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(manager, UserRoleName.Manager);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Could not create Admin user in Seeding");
+                }
+            }
+
+            var userEmail = "user@localhost";
+            var userPassword = "Qaywsx12()";
+            AppUser user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
             {
-                user = new AppUser { FirstName = "Alexander", LastName = "Neumann", Email = "admin@localhost", UserName = "admin" };
+                user = new AppUser { FirstName = "John", LastName = "Doe", Email = userEmail, UserName = userEmail };
 
-                var result = await _userManager.CreateAsync(user, "M109a3gh()");
-                if (result != IdentityResult.Success)
+                var result = await _userManager.CreateAsync(user, userPassword);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, UserRoleName.Member);
+                }
+                else
+                {
                     throw new InvalidOperationException("Could not create Admin user in Seeding");
+                }
             }
         }
 
@@ -139,26 +212,26 @@ namespace BeltTester.Data
             await _context.SaveChangesAsync();
         }
 
-        public async Task InitPrograms()
+        public void InitPrograms()
         {
-            if (await _context.BeltTestPrograms.AnyAsync())
-                return;
+            //if (await _context.BeltTestPrograms.AnyAsync())
+            //    return;
 
-            var items = new BeltTestProgram[]
-            {
-                new BeltTestProgram
-                {
-                    Name = "Weißer Gürtel",
-                    Graduation = 9,
-                    GraduationType = GraduationType.Kyu,
-                    StyleName = "Shotokan"
-                }
-            };
+            //var items = new BeltTestProgram[]
+            //{
+            //    new BeltTestProgram
+            //    {
+            //        Name = "Weißer Gürtel",
+            //        Graduation = 9,
+            //        GraduationType = GraduationType.Kyu,
+            //        StyleName = "Shotokan"
+            //    }
+            //};
 
-            foreach (var item in items)
-                await _context.BeltTestPrograms.AddAsync(item);
+            //foreach (var item in items)
+            //    await _context.BeltTestPrograms.AddAsync(item);
 
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
         }
     }
 }

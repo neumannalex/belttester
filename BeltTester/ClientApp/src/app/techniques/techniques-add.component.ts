@@ -52,7 +52,7 @@ export class TechniquesAddComponent implements OnInit {
       );
   }
 
-  cancel(form) {
+  cancel() {
     this.router.navigate(['/techniques']);
   }
 }

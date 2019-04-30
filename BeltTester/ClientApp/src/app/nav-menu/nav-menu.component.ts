@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
 import { ProfileMenuComponent } from '../profile/profile-menu.component';
 import { AuthenticationService } from '../_services';
+import { fadeInContent } from '@angular/material';
 
 @Component({
   selector: 'app-nav-menu',
@@ -10,6 +11,9 @@ import { AuthenticationService } from '../_services';
 })
 export class NavMenuComponent implements OnInit {
   isLoggedIn: boolean = false;
+  isMember: boolean = false;
+  isManager: boolean = false;
+  isAdmin: boolean = false;
   isExpanded = false;
 
   constructor(private authenticationService: AuthenticationService) {}
@@ -28,9 +32,17 @@ export class NavMenuComponent implements OnInit {
     let currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (currentUser) {
       this.isLoggedIn = true;
+
+      this.isAdmin = this.authenticationService.hasRole('Admin');
+      this.isManager = this.authenticationService.hasRole('Manager');
+      this.isMember = this.authenticationService.hasRole('Member');
     }
     else {
       this.isLoggedIn = false;
+
+      this.isAdmin = false;
+      this.isManager = false;
+      this.isMember = false;
     }
   }
 

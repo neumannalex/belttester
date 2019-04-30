@@ -94,7 +94,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<ActionResult<CombinationDTO>> PostCombination([FromBody]CombinationDTOForCreation itemForCreation)
         {
             if (itemForCreation == null)
@@ -120,7 +120,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPost("create")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<ActionResult<CombinationDTO>> CreateCombination([FromBody]CombinationDTOForCreation itemForCreation)
         {
             if (itemForCreation == null)
@@ -166,7 +166,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPost("createwithids")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<ActionResult<CombinationDTO>> CreateCombinationWithIds([FromBody]CombinationDTOForCreationWithIds itemForCreation)
         {
             if (itemForCreation == null)
@@ -212,7 +212,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<IActionResult> DeleteMove(int id)
         {
             try

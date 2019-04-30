@@ -4,6 +4,7 @@ import { map, retry } from 'rxjs/operators';
 import { AuthenticationRequestParameters, AuthenticationResponseParameters } from '../_models/authenticationParameters';
 import { User } from '../_models/user';
 import { Subject, Observable } from 'rxjs';
+import * as JWT from 'jwt-decode';
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
@@ -16,6 +17,10 @@ export class AuthenticationService {
   }
 
   constructor(private http: HttpClient, @Inject('BASE_URL') private _baseUrl: string) { }
+
+  private convertToArrayOfString = (object) => {
+    return (typeof object === 'string') ? Array(object) : object;
+  }
 
   login(username: string, password: string) {
     let parameters: AuthenticationRequestParameters =
@@ -30,12 +35,23 @@ export class AuthenticationService {
         if (auth && auth.token) {
           // store user details and jwt token in local storage to keep user logged in between page refreshes
 
+          let claims = JWT(auth.token);
+          //console.log("Claims:");
+          //console.log(claims);
+
           let currentUser: User =
           {
-            username: username,
+            firstname: claims.given_name,
+            lastname: claims.family_name,
+            username: claims.sub,
+            email: claims.email,
             token: auth.token,
-            expiration: auth.expiration
+            expiration: auth.expiration,
+            roles: this.convertToArrayOfString(claims['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'])
           }
+
+          //console.log("User:");
+          //console.log(currentUser);
 
           localStorage.setItem('currentUser', JSON.stringify(currentUser));
           this._loggedIn = true;
@@ -51,5 +67,15 @@ export class AuthenticationService {
     localStorage.removeItem('currentUser');
     this._loggedIn = false;
     this.observer.next(this._loggedIn);
+  }
+
+  hasRole(roleName: string): boolean {
+    let currentUser = <User>JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUser) {
+      return currentUser.roles.indexOf(roleName) > -1;
+    }
+    else {
+      return false;
+    }
   }
 }

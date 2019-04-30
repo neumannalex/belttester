@@ -45,7 +45,7 @@ export class MovesAddComponent implements OnInit {
       );
   }
 
-  cancel(form) {
+  cancel() {
     this.router.navigate(['/moves']);
   }
 }

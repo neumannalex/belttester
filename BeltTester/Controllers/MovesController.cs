@@ -92,7 +92,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<ActionResult<MoveDTO>> PutMove(int id, [FromBody]MoveDTOForUpdate itemForUpdate)
         {
             var item = _mapper.Map<Move>(itemForUpdate);
@@ -117,7 +117,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPatch("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<ActionResult<MoveDTO>> PatchMove(int id, [FromBody]JsonPatchDocument<MoveDTOForUpdate> itemPatch)
         {
             var item = await _repository.GetMove(id);
@@ -152,7 +152,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<ActionResult<MoveDTO>> PostMove([FromBody]MoveDTOForCreation itemForCreation)
         {
             if (itemForCreation == null)
@@ -178,7 +178,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<IActionResult> DeleteMove(int id)
         {
             try

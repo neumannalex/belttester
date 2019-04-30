@@ -48,7 +48,7 @@ export class StancesAddComponent implements OnInit {
       );
   }
 
-  cancel(form) {
+  cancel() {
     this.router.navigate(['/stances']);
   }
 }

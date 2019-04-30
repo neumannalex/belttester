@@ -95,7 +95,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<ActionResult<TechniqueDTO>> PutTechnique(int id, [FromBody]TechniqueDTOForUpdate itemForUpdate)
         {
             var item = _mapper.Map<Technique>(itemForUpdate);
@@ -120,7 +120,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPatch("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<ActionResult<TechniqueDTO>> PatchTechnique(int id, [FromBody]JsonPatchDocument<TechniqueDTOForUpdate> itemPatch)
         {
             var item = await _repository.GetTechnique(id);
@@ -155,7 +155,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<ActionResult<TechniqueDTO>> PostTechnique([FromBody]TechniqueDTOForCreation itemForCreation)
         {
             if (itemForCreation == null)
@@ -181,7 +181,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<IActionResult> DeleteTechnique(int id)
         {
             try

@@ -27,10 +27,17 @@ namespace BeltTester
         private static void SeedDb(IWebHost host)
         {
             var scopeFactory = host.Services.GetService<IServiceScopeFactory>();
-            using (var scope = scopeFactory.CreateScope())
+            if (scopeFactory != null)
             {
-                var seeder = scope.ServiceProvider.GetService<DbInitializer>();
-                seeder.InitialzeAsync().Wait();
+                using (var scope = scopeFactory.CreateScope())
+                {
+                    var seeder = scope.ServiceProvider.GetService<DbInitializer>();
+                    seeder.InitialzeAsync().Wait();
+                }
+            }
+            else
+            {
+                Console.WriteLine("Cannot create IServiceScopeFactory.");
             }
         }
 

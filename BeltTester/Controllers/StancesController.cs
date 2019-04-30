@@ -92,7 +92,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<ActionResult<StanceDTO>> PutStance(int id, [FromBody]StanceDTOForUpdate itemForUpdate)
         {
             var item = _mapper.Map<Stance>(itemForUpdate);
@@ -117,7 +117,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPatch("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<ActionResult<StanceDTO>> PatchTechnique(int id, [FromBody]JsonPatchDocument<StanceDTOForUpdate> itemPatch)
         {
             var item = await _repository.GetStance(id);
@@ -152,7 +152,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<ActionResult<StanceDTO>> PostStance([FromBody]StanceDTOForCreation itemForCreation)
         {
             if (itemForCreation == null)
@@ -178,7 +178,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<IActionResult> DeleteStance(int id)
         {
             try

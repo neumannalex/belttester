@@ -59,7 +59,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpPost("createwithids")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<ActionResult<BeltTestProgramDTO>> CreateCombinationWithIds([FromBody]BeltTestProgramDTOForCreationWithIds itemForCreation)
         {
             if (itemForCreation == null)
@@ -126,7 +126,7 @@ namespace BeltTester.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Manager")]
         public async Task<IActionResult> DeleteBeltTestProgram(int id)
         {
             try
