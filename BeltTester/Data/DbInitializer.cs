@@ -3,9 +3,12 @@ using BeltTester.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace BeltTester.Data
@@ -34,7 +37,7 @@ namespace BeltTester.Data
             await InitStances();
             await InitMoves();
             await InitTechniques();
-            InitPrograms();
+            await InitPrograms();
         }
 
         public async Task InitRoles()
@@ -212,26 +215,97 @@ namespace BeltTester.Data
             await _context.SaveChangesAsync();
         }
 
-        public void InitPrograms()
+        public async Task InitPrograms()
         {
-            //if (await _context.BeltTestPrograms.AnyAsync())
-            //    return;
+            var path =  Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),"Data", "Seed");
+            var files = Directory.EnumerateFiles(path, "*.txt");
 
-            //var items = new BeltTestProgram[]
-            //{
-            //    new BeltTestProgram
-            //    {
-            //        Name = "Weißer Gürtel",
-            //        Graduation = 9,
-            //        GraduationType = GraduationType.Kyu,
-            //        StyleName = "Shotokan"
-            //    }
-            //};
+            foreach(var file in files)
+            {
+                var json = File.ReadAllText(file, System.Text.Encoding.Default);
 
-            //foreach (var item in items)
-            //    await _context.BeltTestPrograms.AddAsync(item);
+                try
+                {
+                    var program = ParseBeltTestProgram(json);
 
-            //await _context.SaveChangesAsync();
+                    if (_context.BeltTestPrograms.Where(x => x.Graduation == program.Graduation &&
+                                                     x.GraduationType == program.GraduationType &&
+                                                     x.StyleName.ToLower() == program.StyleName.ToLower())
+                                                    .Count() <= 0)
+                    {
+                        await _context.BeltTestPrograms.AddAsync(program);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private BeltTestProgram ParseBeltTestProgram(string json)
+        {
+            BeltTestProgram program = new BeltTestProgram();
+
+            JObject o = JObject.Parse(json);
+            program.Graduation = (int)o["graduation"];
+            program.GraduationType = Enum.Parse<GraduationType>((string)o["graduationType"], true);
+            program.Name = (string)o["name"];
+            program.StyleName = (string)o["styleName"];
+            program.GraduationColor = (string)o["graduationColor"];
+
+            JArray combinations = (JArray)o["kihonCombinations"];
+            foreach(var c in combinations)
+            {
+                Combination combo = new Combination();
+                combo.SequenceNumber = (int)c["sequenceNumber"];
+
+                JArray motions = (JArray)c["motions"];
+                foreach(var m in motions)
+                {
+                    string stanceSymbol = (string)m["stance"];
+                    string moveSymbol = (string)m["move"];
+                    string techniqueName = (string)m["technique"];
+                    string annotation = (string)m["annotation"];
+                    LevelType techniqueLevel = LevelType.None;
+
+                    if(m["techniqueLevel"] != null)
+                    {
+                        if (!Enum.TryParse<LevelType>((string)m["techniqueLevel"], out techniqueLevel))
+                            techniqueLevel = LevelType.None;
+                    }
+
+                    var stance = _context.Stances.Where(x => x.Symbol.ToLower() == stanceSymbol.ToLower()).FirstOrDefault();
+                    var move = _context.Moves.Where(x => x.Symbol == moveSymbol).FirstOrDefault();
+                    var technique = _context.Techniques.Where(x => x.Name.ToLower() == techniqueName.ToLower() && x.Level == techniqueLevel).FirstOrDefault();
+
+                    if (stance == null)
+                        throw new ArgumentOutOfRangeException($"Stance '{stanceSymbol}' does not exist");
+
+                    if (move == null)
+                        throw new ArgumentOutOfRangeException($"Move '{moveSymbol}' does not exist");
+
+                    if (technique == null)
+                        throw new ArgumentOutOfRangeException($"Technique '{techniqueName}' does not exist");
+
+                    combo.Motions.Add(new Motion
+                    {
+                        Stance = stance,
+                        StanceId = stance.ID,
+                        Move = move,
+                        MoveId = move.ID,
+                        Technique = technique,
+                        TechniqueId = technique.ID,
+                        Annotation = annotation
+                    });
+                }
+
+                program.KihonCombinations.Add(combo);
+            }
+
+            return program;
         }
     }
 }

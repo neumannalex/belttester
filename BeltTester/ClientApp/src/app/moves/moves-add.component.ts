@@ -36,7 +36,7 @@ export class MovesAddComponent implements OnInit {
     this.service.createMove(move)
       .subscribe(
       (data: Move) => {
-          this.router.navigate(['/moves']);
+        this.router.navigate(['/database/moves']);
         },
         (err: any) => {
           console.log(err);
@@ -46,6 +46,6 @@ export class MovesAddComponent implements OnInit {
   }
 
   cancel() {
-    this.router.navigate(['/moves']);
+    this.router.navigate(['/database/moves']);
   }
 }

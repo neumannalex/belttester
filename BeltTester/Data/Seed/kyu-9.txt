@@ -1,0 +1,76 @@
+﻿{
+  "graduation": 9,
+  "graduationType": "Kyu",
+  "graduationColor": "#ffffff",
+  "name": "Weißer Gürtel",
+  "styleName": "Shotokan",
+  "kihonCombinations": [
+    {
+      "sequenceNumber": 1,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "=>",
+          "technique": "Oi-Zuki",
+          "annotation": ""
+        }
+      ]
+    },
+    {
+      "sequenceNumber": 2,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "=>",
+          "technique": "Gyaku-Zuki",
+          "annotation": ""
+        }
+      ]
+    },
+    {
+      "sequenceNumber": 3,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "=>",
+          "technique": "Age-Uke",
+          "annotation": ""
+        }
+      ]
+    },
+    {
+      "sequenceNumber": 4,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "=>",
+          "technique": "Soto-Ude-Uke",
+          "annotation": ""
+        }
+      ]
+    },
+    {
+      "sequenceNumber": 5,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "=>",
+          "technique": "Gedan-Barai",
+          "annotation": ""
+        }
+      ]
+    },
+    {
+      "sequenceNumber": 6,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "=>",
+          "technique": "Mae-Geri",
+          "techniqueLevel": "Chudan",
+          "annotation": "aus Chudan Kamae"
+        }
+      ]
+    }
+  ]
+}

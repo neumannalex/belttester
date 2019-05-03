@@ -1,0 +1,44 @@
+<h2 class="mat-h2">Prüfungsprogramme</h2>
+<mat-divider></mat-divider>
+<div class="example-container mat-elevation-z0" *ngIf="!loaded">
+  Loading ...
+</div>
+<div class="example-container mat-elevation-z0" *ngIf="loaded">
+  <mat-selection-list #list [(ngModel)]="selectedPrograms" (ngModelChange)="onNgModelChange($event)">
+    <mat-list-option *ngFor="let program of programs" [value]="program.id">
+      <div mat-line>
+        <span class="stylename">{{program.styleName}}</span>
+        <span class="programtitleseparator">-</span>
+        <span class="graduationname">{{program.graduation}}. {{program.graduationType}}</span>
+        <span class="programtitleseparator">-</span>
+        <span class="programname">{{program.name}}</span>
+        <span class="titlelogo">
+          <svg width="40" height="20" xmlns="http://www.w3.org/2000/svg"
+               xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 1280 640"
+               preserveAspectRatio="xMidYMid meet">
+            <g transform="translate(0.000000,950.000000) scale(0.100000,-0.100000)" attr.fill="{{program.graduationColor}}" stroke="none">
+              <path d="M9340 7987 c-148 -53 -286 -116 -685 -315 l-370 -185 -55 14 -55 14
+  -6 76 c-8 91 -27 128 -83 161 -39 22 -49 23 -226 22 -102 -1 -358 -6 -570 -12
+  -423 -11 -460 -16 -525 -73 -34 -30 -46 -59 -62 -144 l-8 -41 -215 27 c-230
+  29 -385 58 -447 84 -104 44 -754 55 -3585 62 l-2418 6 0 -728 0 -727 1478 7
+  c813 4 2010 10 2659 14 l1181 6 -114 -226 c-359 -719 -637 -1387 -683 -1646
+  -31 -171 -62 -785 -96 -1923 -28 -943 -61 -2407 -54 -2414 3 -3 345 -8 760
+  -12 l756 -7 6 1284 c6 1230 -5 3909 -18 4244 l-7 160 183 155 c317 269 634
+  520 643 508 1 -1 14 -23 28 -48 54 -94 81 -110 433 -266 788 -349 1115 -447
+  1223 -367 46 34 53 59 49 166 -4 87 -2 97 12 92 97 -38 273 -92 408 -126 199
+  -50 210 -49 295 38 50 52 133 168 180 252 l17 31 244 0 c134 0 246 -2 248 -4
+  4 -5 -2 -302 -20 -956 -6 -217 -18 -633 -26 -925 -15 -516 -49 -1646 -80
+  -2624 -9 -266 -14 -486 -11 -488 8 -8 1405 -37 1412 -30 14 14 44 2815 44
+  4045 l0 982 784 0 784 0 6 183 c3 100 8 422 12 715 l6 532 -1120 0 -1120 0
+  -93 56 c-148 87 -494 256 -620 302 -151 55 -219 72 -309 78 -67 5 -85 2 -170
+  -29z" stroke="black" stroke-width="20" />
+            </g>
+          </svg>
+        </span>
+      </div>
+    </mat-list-option>
+  </mat-selection-list>
+</div>
+<div>
+  <button mat-flat-button color="primary" (click)="showSelectedPrograms()">Auswahl anzeigen</button>
+</div>

@@ -29,7 +29,7 @@ export class DataService {
   }
 
   getTechnique(id: number): Observable<Technique> {
-    return this.http.get<Technique>(`{this._baseUrl}api/techniques/{id}`);
+    return this.http.get<Technique>(this._baseUrl + 'api/techniques/' + id);
   }
 
   createTechnique(item: Technique): Observable<{} | Technique> {
@@ -67,7 +67,7 @@ export class DataService {
   }
 
   getStance(id: number): Observable<Stance> {
-    return this.http.get<Stance>(`{this._baseUrl}api/stances/{id}`);
+    return this.http.get<Stance>(this._baseUrl + 'api/stances/' + id);
   }
 
   createStance(item: Stance): Observable<{} | Stance> {
@@ -105,7 +105,7 @@ export class DataService {
   }
 
   getMove(id: number): Observable<Move> {
-    return this.http.get<Move>(`{this._baseUrl}api/moves/{id}`);
+    return this.http.get<Move>(this._baseUrl + 'api/moves/' + id);
   }
 
   createMove(item: Move): Observable<{} | Move> {
@@ -144,7 +144,7 @@ export class DataService {
   }
 
   getProgram(id: number): Observable<Program> {
-    return this.http.get<Program>(`{this._baseUrl}api/belttestprograms/{id}`);
+    return this.http.get<Program>(this._baseUrl + 'api/belttestprograms/' + id);
   }
 
   deleteProgram(id: number) {

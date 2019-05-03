@@ -43,7 +43,7 @@ export class TechniquesAddComponent implements OnInit {
     this.service.createTechnique(technique)
       .subscribe(
         (data: Technique) => {
-          this.router.navigate(['/techniques']);
+          this.router.navigate(['/database/techniques']);
         },
         (err: any) => {
           console.log(err);
@@ -53,6 +53,6 @@ export class TechniquesAddComponent implements OnInit {
   }
 
   cancel() {
-    this.router.navigate(['/techniques']);
+    this.router.navigate(['/database/techniques']);
   }
 }

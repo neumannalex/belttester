@@ -11,6 +11,7 @@ namespace BeltTester.DTO
         public int ID { get; set; }
         public int Graduation { get; set; }
         public string GraduationType { get; set; }
+        public string GraduationColor { get; set; }
         public string Name { get; set; }
         public string StyleName { get; set; }
 

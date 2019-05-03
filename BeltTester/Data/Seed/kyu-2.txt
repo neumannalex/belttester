@@ -1,0 +1,20 @@
+﻿{
+  "graduation": 2,
+  "graduationType": "Kyu",
+  "name": "Brauner Gürtel",
+  "graduationColor": "#795548",
+  "styleName": "Shotokan",
+  "kihonCombinations": [
+    {
+      "sequenceNumber": 1,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "=>",
+          "technique": "Oi-Zuki",
+          "annotation": ""
+        }
+      ]
+    }
+  ]
+}

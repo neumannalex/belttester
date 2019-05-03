@@ -12,6 +12,10 @@ import { MovesListComponent } from './moves/moves-list.component';
 import { MovesAddComponent } from './moves/moves-add.component';
 
 import { ProgramsListComponent } from './programs/programs-list.component';
+import { ProgramsDetailComponent } from './programs/programs-detail.component';
+
+import { ProgramViewComponent } from './programview/program-view.component';
+import { ProgramOverviewComponent } from './programview/program-overview.component';
 
 import { AuthGuard } from './_guards';
 
@@ -19,13 +23,16 @@ import { AuthGuard } from './_guards';
 const appRoutes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
-  { path: 'techniques', component: TechniquesListComponent, canActivate: [AuthGuard] },
-  { path: 'techniques/create', component: TechniquesAddComponent, canActivate: [AuthGuard] },
-  { path: 'stances', component: StancesListComponent, canActivate: [AuthGuard] },
-  { path: 'stances/create', component: StancesAddComponent, canActivate: [AuthGuard] },
-  { path: 'moves', component: MovesListComponent, canActivate: [AuthGuard] },
-  { path: 'moves/create', component: MovesAddComponent, canActivate: [AuthGuard] },
-  { path: 'programs', component: ProgramsListComponent, canActivate: [AuthGuard] },
+  { path: 'database/techniques', component: TechniquesListComponent, canActivate: [AuthGuard] },
+  { path: 'database/techniques/create', component: TechniquesAddComponent, canActivate: [AuthGuard] },
+  { path: 'database/stances', component: StancesListComponent, canActivate: [AuthGuard] },
+  { path: 'database/stances/create', component: StancesAddComponent, canActivate: [AuthGuard] },
+  { path: 'database/moves', component: MovesListComponent, canActivate: [AuthGuard] },
+  { path: 'database/moves/create', component: MovesAddComponent, canActivate: [AuthGuard] },
+  { path: 'database/programs', component: ProgramsListComponent, canActivate: [AuthGuard] },
+  { path: 'database/programs/:id', component: ProgramsDetailComponent, canActivate: [AuthGuard] },
+  { path: 'programs/:id', component: ProgramViewComponent },
+  { path: 'programs', component: ProgramOverviewComponent },
 
   // otherwise redirect to home
   { path: '**', redirectTo: '' }

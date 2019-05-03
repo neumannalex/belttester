@@ -5,7 +5,8 @@ import { Technique } from "./technique";
 export interface Program {
   id: number,
   graduation: number,
-  graduationtype: string,
+  graduationType: string,
+  graduationColor: string,
   name: string,
   stylename: string,
   combinations: Combination[]

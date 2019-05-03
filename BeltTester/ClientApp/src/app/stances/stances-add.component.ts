@@ -39,7 +39,7 @@ export class StancesAddComponent implements OnInit {
     this.service.createStance(stance)
       .subscribe(
       (data: Stance) => {
-          this.router.navigate(['/stances']);
+          this.router.navigate(['/database/stances']);
         },
         (err: any) => {
           console.log(err);
@@ -49,6 +49,6 @@ export class StancesAddComponent implements OnInit {
   }
 
   cancel() {
-    this.router.navigate(['/stances']);
+    this.router.navigate(['/database/stances']);
   }
 }

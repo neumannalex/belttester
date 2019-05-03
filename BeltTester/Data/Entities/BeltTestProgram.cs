@@ -10,6 +10,7 @@ namespace BeltTester.Data.Entities
         public int ID { get; set; }
         public int Graduation { get; set; }
         public GraduationType GraduationType { get; set; }
+        public string GraduationColor { get; set; }
         public string Name { get; set; }
         public string StyleName { get; set; }
 

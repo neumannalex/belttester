@@ -69,7 +69,7 @@ namespace BeltTester.Controllers
                             _configuration["Tokens:Issuer"],
                             _configuration["Tokens:Audience"],
                             claims,
-                            expires: DateTime.Now.AddMinutes(30),
+                            expires: DateTime.Now.AddHours(24),
                             signingCredentials: creds);
 
             var results = new

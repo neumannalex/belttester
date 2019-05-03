@@ -486,11 +486,10 @@ namespace BeltTester.Data
         {
             var item = await _context.BeltTestPrograms.Where(x => x.ID == id)
                 .Include(x => x.KihonCombinations)
-                .Include("Combination")
-                .Include("Motion")
-                .Include("Motions.Stance")
-                .Include("Motions.Move")
-                .Include("Motions.Technique")
+                .Include("KihonCombinations.Motions")
+                .Include("KihonCombinations.Motions.Stance")
+                .Include("KihonCombinations.Motions.Move")
+                .Include("KihonCombinations.Motions.Technique")
                 .FirstOrDefaultAsync();
 
             if (item == null)

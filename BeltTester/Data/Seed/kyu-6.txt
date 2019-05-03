@@ -1,0 +1,134 @@
+﻿{
+  "graduation": 6,
+  "graduationType": "Kyu",
+  "name": "Grüner Gürtel",
+  "graduationColor": "#4caf50",
+  "styleName": "Shotokan",
+  "kihonCombinations": [
+    {
+      "sequenceNumber": 1,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "=>",
+          "technique": "Sanbon-Zuki",
+          "annotation": ""
+        }
+      ]
+    },
+	{
+      "sequenceNumber": 2,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "<=",
+          "technique": "Age-Uke",
+          "annotation": ""
+        },
+		{
+          "stance": "ZK",
+          "move": "/",
+          "technique": "Gyaku-Zuki",
+          "annotation": ""
+        }
+      ]
+    },
+	{
+      "sequenceNumber": 3,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "=>",
+          "technique": "Yoko-Uraken",
+		  "techniqueLevel": "Jodan",
+          "annotation": "aus Chudan-Kamae mit zurückschnappen"
+        }
+      ]
+    },
+	{
+      "sequenceNumber": 4,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "=>",
+          "technique": "Uchi-Ude-Uke",
+          "annotation": ""
+        },
+		{
+          "stance": "ZK",
+          "move": "/",
+          "technique": "Kizami-Zuki",
+          "annotation": ""
+        },
+		{
+          "stance": "ZK",
+          "move": "/",
+          "technique": "Gyaku-Zuki",
+          "annotation": ""
+        }
+      ]
+    },
+	{
+      "sequenceNumber": 5,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "=>",
+          "technique": "Mae-Geri",
+		  "techniqueLevel": "Jodan",
+          "annotation": ""
+        }
+      ]
+    },
+	{
+      "sequenceNumber": 6,
+      "motions": [
+        {
+          "stance": "KK",
+          "move": "<=",
+          "technique": "Shuto-Uke",
+          "annotation": ""
+        },
+		{
+          "stance": "ZK",
+          "move": "/",
+          "technique": "Gyaku-Tate-Nukite",
+          "annotation": ""
+        }
+      ]
+    },
+	{
+      "sequenceNumber": 7,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "=>",
+          "technique": "Mawashi-Geri",
+          "annotation": ""
+        }
+      ]
+    },
+	{
+      "sequenceNumber": 8,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "=>",
+          "technique": "Yoko-Geri Kekomi",
+          "annotation": ""
+        }
+      ]
+    },
+	{
+      "sequenceNumber": 9,
+      "motions": [
+        {
+          "stance": "KB",
+          "move": "<=>",
+          "technique": "Yoko-Geri Keage",
+          "annotation": "3x links, 3x rechts mit Übersetzschritt"
+        }
+      ]
+    }
+  ]
+}

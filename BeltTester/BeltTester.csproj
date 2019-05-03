@@ -19,6 +19,8 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
+    <PackageReference Include="MySql.Data.EntityFrameworkCore" Version="8.0.16" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />
     <PackageReference Include="Sieve" Version="2.3.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc2" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.12" />
@@ -39,7 +41,12 @@
     <None Remove="ClientApp\src\app\moves\moves-add.component.ts" />
     <None Remove="ClientApp\src\app\moves\moves-list.component.ts" />
     <None Remove="ClientApp\src\app\profile\profile-menu.component.ts" />
+    <None Remove="ClientApp\src\app\programs\programs-detail.component.ts" />
     <None Remove="ClientApp\src\app\programs\programs-list.component.ts" />
+    <None Remove="ClientApp\src\app\programview\combination-view.component.ts" />
+    <None Remove="ClientApp\src\app\programview\motion-view.component.ts" />
+    <None Remove="ClientApp\src\app\programview\program-overview.component.ts" />
+    <None Remove="ClientApp\src\app\programview\program-view.component.ts" />
     <None Remove="ClientApp\src\app\stances\stances-add.component.ts" />
     <None Remove="ClientApp\src\app\stances\stances-list.component.ts" />
     <None Remove="ClientApp\src\app\techniques\sortable.directive.ts" />
@@ -77,7 +84,12 @@
     <TypeScriptCompile Include="ClientApp\src\app\moves\moves-list.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\moves\moves-add.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\profile\profile-menu.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\programs\programs-detail.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\programs\programs-list.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\programview\combination-view.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\programview\motion-view.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\programview\program-overview.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\programview\program-view.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\stances\stances-list.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\stances\stances-add.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\techniques\techniques-add.component.ts" />
@@ -96,6 +108,39 @@
     <TypeScriptCompile Include="ClientApp\src\app\_services\authentication.service.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\_services\index.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\_services\data.service.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ClientApp\src\assets\img\belttester-logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\kyu-1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\kyu-2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\kyu-3.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\kyu-4.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\kyu-5.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\kyu-6.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\kyu-7.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\kyu-8.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\kyu-9.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

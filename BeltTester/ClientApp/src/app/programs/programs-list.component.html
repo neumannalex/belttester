@@ -37,7 +37,11 @@
     <!-- actions Column -->
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef> Aktionen </mat-header-cell>
-      <mat-cell *matCellDef="let row"><i class="fa fa-trash" (click)="deleteItem(row)" matTooltip="Prüfungsprogramm löschen" matTooltipPosition="after"></i></mat-cell>
+      <mat-cell *matCellDef="let row">
+        <i class="fa fa-search px-2" (click)="viewItem(row)" matTooltip="Programm anzeigen" matTooltipPosition="after"></i>
+        <i class="fa fa-edit px-2" (click)="showItemDetails(row)" matTooltip="Details anzeigen" matTooltipPosition="after"></i>
+        <i class="fa fa-trash px-2" (click)="deleteItem(row)" matTooltip="Prüfungsprogramm löschen" matTooltipPosition="after"></i>
+      </mat-cell>
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

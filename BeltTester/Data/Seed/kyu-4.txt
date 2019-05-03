@@ -1,0 +1,20 @@
+﻿{
+  "graduation": 4,
+  "graduationType": "Kyu",
+  "name": "Blauer Gürtel",
+  "graduationColor": "#2196f3",
+  "styleName": "Shotokan",
+  "kihonCombinations": [
+    {
+      "sequenceNumber": 1,
+      "motions": [
+        {
+          "stance": "ZK",
+          "move": "=>",
+          "technique": "Oi-Zuki",
+          "annotation": ""
+        }
+      ]
+    }
+  ]
+}

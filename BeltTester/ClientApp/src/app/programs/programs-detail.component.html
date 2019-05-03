@@ -1,0 +1,62 @@
+<h2 class="mat-h2">Prüfungsprogramm (Edit)</h2>
+<mat-divider></mat-divider>
+
+<div class="example-container mat-elevation-z0" *ngIf="loaded">
+  <h3 class="mat-h3">{{program.graduation}}. {{program.graduationType}} - {{program.name}} ({{program.styleName}})</h3>
+
+  <mat-accordion>
+    <!-- Kihon panel -->
+    <mat-expansion-panel [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Kihon</mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <mat-list>
+        <mat-list-item *ngFor="let combination of program.kihonCombinations">
+          <span>{{combination.sequenceNumber}}.</span>
+          <span [innerHTML]="getFriendlyCombination(combination)"></span>
+        </mat-list-item>
+      </mat-list>
+    </mat-expansion-panel>
+
+    <!-- Kata panel -->
+    <mat-expansion-panel [expanded]="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Kata</mat-panel-title>
+      </mat-expansion-panel-header>
+      <p>Keine Daten verfügbar.</p>
+    </mat-expansion-panel>
+
+    <!-- Kumite panel -->
+    <mat-expansion-panel [expanded]="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Kumite</mat-panel-title>
+      </mat-expansion-panel-header>
+      <p>Keine Daten verfügbar.</p>
+    </mat-expansion-panel>
+
+    <!-- Freikampf panel -->
+    <mat-expansion-panel [expanded]="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Partnerübung zum Freikamp</mat-panel-title>
+      </mat-expansion-panel-header>
+      <p>Keine Daten verfügbar.</p>
+    </mat-expansion-panel>
+
+    <!-- Source panel -->
+    <mat-expansion-panel [expanded]="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Raw Data</mat-panel-title>
+      </mat-expansion-panel-header>
+      <code>{{program | json}}</code>
+    </mat-expansion-panel>
+
+  </mat-accordion>
+</div>
+<div *ngIf="!loaded">
+  Loading...
+</div>
+
+<div class="my-2">
+  <button mat-flat-button color="primary" [routerLink]='["/database/programs"]'>Zurück</button>
+</div>

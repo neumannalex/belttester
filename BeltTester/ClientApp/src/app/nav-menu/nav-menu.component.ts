@@ -3,6 +3,11 @@ import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
 import { ProfileMenuComponent } from '../profile/profile-menu.component';
 import { AuthenticationService } from '../_services';
 import { fadeInContent } from '@angular/material';
+import { Router } from '@angular/router'
+import { DataService } from '../_services/data.service';
+import { Program, Combination, Motion } from '../_models/program';
+import { MatPaginator, MatSort, MatTableDataSource, MatDialog, MatSnackBar, MatSortable } from '@angular/material';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-nav-menu',
@@ -15,20 +20,52 @@ export class NavMenuComponent implements OnInit {
   isManager: boolean = false;
   isAdmin: boolean = false;
   isExpanded = false;
+  programs: Program[] = [];
 
-  constructor(private authenticationService: AuthenticationService) {}
+  constructor(private authenticationService: AuthenticationService, private dataService: DataService, private snackBar: MatSnackBar, private router: Router) {}
 
   ngOnInit() {
     this.setAuthenticationState();
 
     this.authenticationService.isLoggedIn().subscribe(loggedIn => {
-      //console.log("Got event from authenticationService.isLoggedIn()");
       this.setAuthenticationState();
     });
+
+    this.loadPrograms();
+  }
+
+  private loadPrograms() {
+    this.dataService.getAllPrograms().subscribe((data: Program[]) => {
+      data.sort(this.compareByGraduation);
+
+      this.programs = data;
+    },
+      (error: any) => {
+        let snackBarRef = this.snackBar.open('Daten konnten nicht geladen werden.', 'Bitte versuchen sie es später erneut.', { duration: 5000, verticalPosition: 'top' });
+        snackBarRef.afterDismissed().subscribe(() => {
+          this.router.navigate(['/']);
+        });
+      }
+    );
+  }
+
+  private compareByGraduation(a: Program, b: Program) {
+    if (a === null || b === null)
+      return 0;
+
+    let aValue: number = a.graduationType.toLowerCase() == 'kyu' ? a.graduation + 1000 : a.graduation;
+    let bValue: number = b.graduationType.toLowerCase() == 'kyu' ? b.graduation + 1000 : b.graduation;
+
+    if (aValue < bValue) {
+      return 1;
+    }
+    if (aValue > bValue) {
+      return -1;
+    }
+    return 0;
   }
 
   private setAuthenticationState() {
-    //console.log("setAuthenticationState() was called");
     let currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (currentUser) {
       this.isLoggedIn = true;

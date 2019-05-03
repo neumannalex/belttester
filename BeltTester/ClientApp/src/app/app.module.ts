@@ -64,6 +64,12 @@ import { MovesListComponent } from './moves/moves-list.component';
 import { MovesAddComponent } from './moves/moves-add.component';
 
 import { ProgramsListComponent } from './programs/programs-list.component';
+import { ProgramsDetailComponent } from './programs/programs-detail.component';
+
+import { ProgramOverviewComponent } from './programview/program-overview.component';
+import { ProgramViewComponent } from './programview/program-view.component';
+import { MotionViewComponent } from './programview/motion-view.component';
+import { CombinationViewComponent } from './programview/combination-view.component';
 
 import { DataService } from './_services';
 
@@ -88,7 +94,12 @@ import { routing } from './app.routing';
     MovesListComponent,
     MovesAddComponent,
     ProgramsListComponent,
+    ProgramsDetailComponent,
     ProfileMenuComponent,
+    ProgramOverviewComponent,
+    ProgramViewComponent,
+    MotionViewComponent,
+    CombinationViewComponent,
     YesNoDialog
   ],
   imports: [
@@ -173,10 +184,14 @@ import { routing } from './app.routing';
     DecimalPipe,
     DataService
   ],
-  bootstrap: [AppComponent],
+  bootstrap: [
+    AppComponent
+  ],
   entryComponents: [
     OkCancelDialogComponent,
-    YesNoDialog
+    YesNoDialog,
+    MotionViewComponent,
+    CombinationViewComponent
   ]
 })
 export class AppModule { }

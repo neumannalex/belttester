@@ -1,0 +1,15 @@
+.home-container {
+  
+}
+
+.bg {
+  /* The image used */
+  background: url("/assets/img/belttester-logo.png") no-repeat center center;
+  /* Full height */
+  height: 100vh;
+  /*background-size: cover;*/
+}
+
+.centered {
+  text-align: center;
+}

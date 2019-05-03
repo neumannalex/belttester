@@ -1,6 +1,7 @@
 using AutoMapper;
 using BeltTester.Data;
 using BeltTester.Data.Entities;
+using BeltTester.Helpers;
 using BeltTester.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -61,25 +62,27 @@ namespace BeltTester
                 });
 
             // Use SQL Database if in Azure, otherwise, use local DB
-            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
-            {
-                Console.WriteLine("Creating BeltTesterDBContext in Production Environment");
-                Console.WriteLine("Connectionstring: " + Configuration.GetConnectionString("MYSQLCONNSTR_localdb"));
-                
-                services.AddDbContext<BeltTesterDBContext>(options =>
-                        options.UseSqlServer(Configuration.GetConnectionString("MYSQLCONNSTR_localdb")));
-            }
-            else
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
             {
                 Console.WriteLine("Creating BeltTesterDBContext in Development Environment");
-                Console.WriteLine("Connectionstring: " + Configuration.GetConnectionString("MYSQLCONNSTR_localdb"));
+                Console.WriteLine("Connectionstring: " + Configuration.GetConnectionString("DefaultConnection"));
 
                 services.AddDbContext<BeltTesterDBContext>(options =>
                         options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             }
+            else
+            {
+                AzureInAppDBConnectionstring conn = AzureInAppDBConnectionstring.FromFile(@"d:\home\data\mysql\MYSQLCONNSTR_localdb.txt");
+                
+                Console.WriteLine("Creating BeltTesterDBContext in Production Environment");
+                Console.WriteLine("Connectionstring: " + conn.ToMySqlConnectionString());
+
+                services.AddDbContext<BeltTesterDBContext>(options =>
+                        options.UseMySql(conn.ToMySqlConnectionString()));
+            }
 
             // Automatically perform database migration
-            services.BuildServiceProvider().GetService<BeltTesterDBContext>().Database.Migrate();
+            //services.BuildServiceProvider().GetService<BeltTesterDBContext>().Database.Migrate();
 
             services.AddTransient<DbInitializer>();
 
