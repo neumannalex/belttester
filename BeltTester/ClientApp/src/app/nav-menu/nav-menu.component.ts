@@ -53,14 +53,14 @@ export class NavMenuComponent implements OnInit {
     if (a === null || b === null)
       return 0;
 
-    let aValue: number = a.graduationType.toLowerCase() == 'kyu' ? a.graduation + 1000 : a.graduation;
-    let bValue: number = b.graduationType.toLowerCase() == 'kyu' ? b.graduation + 1000 : b.graduation;
+    let aValue: number = a.graduationType.toLowerCase() == 'kyu' ? 10 - a.graduation : 100 + a.graduation;
+    let bValue: number = b.graduationType.toLowerCase() == 'kyu' ? 10 - b.graduation : 100 + b.graduation;
 
     if (aValue < bValue) {
-      return 1;
+      return -1;
     }
     if (aValue > bValue) {
-      return -1;
+      return 1;
     }
     return 0;
   }

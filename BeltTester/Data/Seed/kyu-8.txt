@@ -9,6 +9,7 @@
       "sequenceNumber": 1,
       "motions": [
         {
+		  "sequenceNumber": 1,
           "stance": "ZK",
           "move": "=>",
           "technique": "Oi-Zuki",
@@ -20,6 +21,7 @@
       "sequenceNumber": 2,
       "motions": [
         {
+		  "sequenceNumber": 1,
           "stance": "ZK",
           "move": "=>",
           "technique": "Gyaku-Zuki",
@@ -31,6 +33,7 @@
       "sequenceNumber": 3,
       "motions": [
         {
+		  "sequenceNumber": 1,
           "stance": "ZK",
           "move": "<=",
           "technique": "Age-Uke",
@@ -42,6 +45,7 @@
       "sequenceNumber": 4,
       "motions": [
         {
+		  "sequenceNumber": 1,
           "stance": "ZK",
           "move": "=>",
           "technique": "Uchi-Ude-Uke",
@@ -53,6 +57,7 @@
       "sequenceNumber": 5,
       "motions": [
         {
+		  "sequenceNumber": 1,
           "stance": "ZK",
           "move": "<=",
           "technique": "Soto-Ude-Uke",
@@ -64,6 +69,7 @@
       "sequenceNumber": 6,
       "motions": [
         {
+		  "sequenceNumber": 1,
           "stance": "ZK",
           "move": "=>",
           "technique": "Gedan-Barai",
@@ -75,6 +81,7 @@
       "sequenceNumber": 7,
       "motions": [
         {
+		  "sequenceNumber": 1,
           "stance": "KK",
           "move": "=>",
           "technique": "Shuto-Uke",
@@ -86,6 +93,7 @@
       "sequenceNumber": 8,
       "motions": [
         {
+		  "sequenceNumber": 1,
           "stance": "ZK",
           "move": "=>",
           "technique": "Mae-Geri",
@@ -98,6 +106,7 @@
       "sequenceNumber": 9,
       "motions": [
         {
+		  "sequenceNumber": 1,
           "stance": "KB",
           "move": "<=>",
           "technique": "Yoko-Geri Kekomi",

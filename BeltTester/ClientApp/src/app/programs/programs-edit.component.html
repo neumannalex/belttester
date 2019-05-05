@@ -1,0 +1,121 @@
+<mat-card class="form-card">
+  <mat-card-header>
+    <mat-card-title>{{pageTitle}}</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="container" novalidate>
+      <form novalidate (ngSubmit)="saveProgram()" [formGroup]="programForm">
+        <div class="container">
+          <h2 class="mat-h2">Kopfdaten</h2>
+          <div>
+            <span>
+              <mat-form-field class="form-element">
+                <mat-label>Stilrichtung</mat-label>
+                <input matInput placeholder="Shotokan" formControlName="styleName">
+              </mat-form-field>
+            </span>
+            <span>
+              <mat-form-field class="form-element">
+                <mat-label>Titel</mat-label>
+                <input matInput placeholder="Weißer Gürtel" formControlName="name">
+              </mat-form-field>
+            </span>
+          </div>
+
+          <div>
+            <span>
+              <mat-form-field class="form-element">
+                <mat-label>Gürtelfarbe</mat-label>
+                <input matInput placeholder="#ffffff" formControlName="graduationColor">
+              </mat-form-field>
+            </span>
+            <span>
+              <mat-form-field class="form-element">
+                <mat-label>Graduierung</mat-label>
+                <input matInput type="number" min="1" max="9" placeholder="9" formControlName="graduation">
+              </mat-form-field>
+            </span>
+            <span>
+              <mat-radio-group formControlName="graduationType">
+                <mat-radio-button value="Kyu" class="form-element" style="margin: 0 12px;">Kyu</mat-radio-button>
+                <mat-radio-button value="Dan" class="form-element" style="margin: 0 12px;">Dan</mat-radio-button>
+              </mat-radio-group>
+            </span>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <mat-accordion>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>Kihon</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="container">
+              <h2 class="mat-h2">Kombinationen</h2>
+              <div formArrayName="kihonCombinations">
+                <div *ngFor="let combination of programForm.get('kihonCombinations').controls; let i=index">
+
+                  <!-- Kombination -->
+                  <fieldset style="border:solid; padding: 2px">
+                    <legend>Kombination {{combination.value.sequenceNumber}}</legend>
+                    <button>Kombination löschen</button>
+                    <div [formGroupName]="i">
+                      <div formArrayName="motions">
+                        <div *ngFor="let motion of combination.get('motions').controls; let j = index">
+
+                          <!-- Motion -->
+                          <!--<fieldset style="border:dotted; padding: 2px">-->
+                          <div [formGroupName]="j">
+                            <span formGroupName="stance">
+                              <mat-form-field class="form-element">
+                                <mat-select placeholder="Stand auswählen" formControlName="id" value="id">
+                                  <mat-option *ngFor="let s of stancesList" [value]="s.id">{{s.name}} ({{s.symbol}})</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </span>
+                            <span formGroupName="move">
+                              <mat-form-field class="form-element">
+                                <mat-select placeholder="Bewegung auswählen" formControlName="id" value="id">
+                                  <mat-option *ngFor="let m of movesList" [value]="m.id">{{m.name}} ({{m.symbol}})</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </span>
+                            <span formGroupName="technique">
+                              <mat-form-field class="form-element">
+                                <mat-select placeholder="Technik auswählen" formControlName="id" value="id">
+                                  <mat-option *ngFor="let t of techniquesList" [value]="t.id">{{t.name}} {{t.level}}</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </span>
+                            <span>
+                              <mat-form-field class="form-element">
+                                <mat-label>Anmerkung</mat-label>
+                                <input matInput type="text" placeholder="#ffffff" formControlName="annotation">
+                              </mat-form-field>
+                            </span>
+                            <i class="fas fa-minus-square fa-2x px-2" (click)="deleteMotion(i, j)" matTooltip="Bewegung löschen" matTooltipPosition="after"></i>
+
+                            <i class="fas fa-plus-square fa-2x px-2" (click)="addMotion(i)" matTooltip="Bewegung hinzufügen" matTooltipPosition="after" *ngIf="j == combination.get('motions').controls.length - 1"></i>
+                          </div>
+                          <!--</fieldset>-->
+                          <!-- Motion -->
+                        </div>
+                        <!--<button (click)="addMotion(i)">Motion hinzufügen</button>-->
+                      </div>
+                    </div>
+                  </fieldset>
+                  <!-- Kombination -->
+
+                </div>
+                <button >Kombination hinzufügen</button>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+          
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -66,3 +66,8 @@
   padding-left: 2px;
   padding-right: 2px;
 }
+
+.alreadyshown {
+  text-decoration-line: line-through;
+  color: gainsboro;
+}

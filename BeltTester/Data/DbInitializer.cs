@@ -265,6 +265,7 @@ namespace BeltTester.Data
                 JArray motions = (JArray)c["motions"];
                 foreach(var m in motions)
                 {
+                    int sequenceNumber = (int)m["sequenceNumber"];
                     string stanceSymbol = (string)m["stance"];
                     string moveSymbol = (string)m["move"];
                     string techniqueName = (string)m["technique"];
@@ -292,6 +293,7 @@ namespace BeltTester.Data
 
                     combo.Motions.Add(new Motion
                     {
+                        SequenceNumber = sequenceNumber,
                         Stance = stance,
                         StanceId = stance.ID,
                         Move = move,

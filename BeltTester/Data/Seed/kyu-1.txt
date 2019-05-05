@@ -9,6 +9,7 @@
       "sequenceNumber": 1,
       "motions": [
         {
+		  "sequenceNumber": 1,
           "stance": "ZK",
           "move": "=>",
           "technique": "Oi-Zuki",

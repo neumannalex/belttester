@@ -65,6 +65,7 @@ import { MovesAddComponent } from './moves/moves-add.component';
 
 import { ProgramsListComponent } from './programs/programs-list.component';
 import { ProgramsDetailComponent } from './programs/programs-detail.component';
+import { ProgramsEditComponent } from './programs/programs-edit.component';
 
 import { ProgramOverviewComponent } from './programview/program-overview.component';
 import { ProgramViewComponent } from './programview/program-view.component';
@@ -95,6 +96,7 @@ import { routing } from './app.routing';
     MovesAddComponent,
     ProgramsListComponent,
     ProgramsDetailComponent,
+    ProgramsEditComponent,
     ProfileMenuComponent,
     ProgramOverviewComponent,
     ProgramViewComponent,

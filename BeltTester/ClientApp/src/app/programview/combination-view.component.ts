@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Combination } from '../_models/program';
+import { Combination, Motion } from '../_models/program';
+import { retry } from 'rxjs/operators';
 
 @Component({
   selector: 'combination-view',
@@ -15,5 +16,16 @@ export class CombinationViewComponent implements OnInit {
   @Input() combination: Combination;
 
   ngOnInit() {
+    if (this.combination) {
+      this.combination.motions.sort((a: Motion, b: Motion) => {
+        if (a.sequenceNumber < b.sequenceNumber) {
+          return -1;
+        }
+        if (a.sequenceNumber > b.sequenceNumber) {
+          return 1;
+        }
+        return 0;
+      });
+    }
   }
 }

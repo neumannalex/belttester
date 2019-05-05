@@ -8,6 +8,7 @@ import { Stance } from "../_models/stance";
 import { Move } from "../_models/move";
 import { Technique } from "../_models/technique";
 import { concat } from 'rxjs';
+import { retry } from 'rxjs/operators';
 
 @Component({
   selector: 'programs-list',
@@ -29,13 +30,15 @@ export class ProgramsListComponent implements OnInit {
 
   private loadData() {
     this.dataService.getAllPrograms().subscribe((data: Program[]) => {
-      data.sort(this.compareByGraduation);
+      //data.sort(this.compareByGraduation);
 
       this.dataSource = new MatTableDataSource(data);
       this.dataSource.paginator = this.paginator;
 
-      //this.sort.sort(<MatSortable>({ id: 'graduation', start: 'desc' }));
+      
       this.dataSource.sort = this.sort;
+      this.dataSource.sortingDataAccessor = this.sortPrograms;
+      this.sort.sort(<MatSortable>({ id: 'graduation', start: 'asc' }));
     },
       (error: any) => {
         let snackBarRef = this.snackBar.open('Daten konnten nicht geladen werden.', 'Bitte versuchen sie es später erneut.', { duration: 5000, verticalPosition: 'top' });
@@ -46,12 +49,21 @@ export class ProgramsListComponent implements OnInit {
     );
   }
 
+  private sortPrograms(program: Program, sortHeaderId: string): string | number {
+    switch (sortHeaderId) {
+      case 'graduation':
+        return program.graduationType.toLowerCase() == 'kyu' ? 10 - program.graduation : 100 + program.graduation;
+      default:
+        return program[sortHeaderId];
+    }
+  }
+
   private compareByGraduation(a: Program, b: Program) {
     if (a === null || b === null)
       return 0;
 
-    let aValue: number = a.graduationType.toLowerCase() == 'kyu' ? a.graduation + 1000 : a.graduation;
-    let bValue: number = b.graduationType.toLowerCase() == 'kyu' ? b.graduation + 1000 : b.graduation;
+    let aValue: number = a.graduationType.toLowerCase() == 'kyu' ? 10 - a.graduation : 100 + a.graduation;
+    let bValue: number = b.graduationType.toLowerCase() == 'kyu' ? 10 - b.graduation : 100 + b.graduation;
 
     if (aValue < bValue) {
       return 1;
@@ -73,7 +85,7 @@ export class ProgramsListComponent implements OnInit {
   }
 
   showItemDetails(item: Program) {
-    this.router.navigateByUrl("database/programs/" + item.id);
+    this.router.navigateByUrl("/database/programs/" + item.id + "/edit");
   }
 
   deleteItem(item: Program) {

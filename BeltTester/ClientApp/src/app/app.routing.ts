@@ -13,9 +13,11 @@ import { MovesAddComponent } from './moves/moves-add.component';
 
 import { ProgramsListComponent } from './programs/programs-list.component';
 import { ProgramsDetailComponent } from './programs/programs-detail.component';
+import { ProgramsEditComponent } from './programs/programs-edit.component';
 
 import { ProgramViewComponent } from './programview/program-view.component';
 import { ProgramOverviewComponent } from './programview/program-overview.component';
+
 
 import { AuthGuard } from './_guards';
 
@@ -31,6 +33,7 @@ const appRoutes: Routes = [
   { path: 'database/moves/create', component: MovesAddComponent, canActivate: [AuthGuard] },
   { path: 'database/programs', component: ProgramsListComponent, canActivate: [AuthGuard] },
   { path: 'database/programs/:id', component: ProgramsDetailComponent, canActivate: [AuthGuard] },
+  { path: 'database/programs/:id/edit', component: ProgramsEditComponent, canActivate: [AuthGuard] },
   { path: 'programs/:id', component: ProgramViewComponent },
   { path: 'programs', component: ProgramOverviewComponent },
 

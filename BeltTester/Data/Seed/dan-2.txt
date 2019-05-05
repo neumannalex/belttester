@@ -1,8 +1,8 @@
 ﻿{
-  "graduation": 5,
-  "graduationType": "Kyu",
-  "name": "Blauer Gürtel",
-  "graduationColor": "#2196f3",
+  "graduation": 2,
+  "graduationType": "Dan",
+  "name": "Schwarzer Gürtel",
+  "graduationColor": "#000000",
   "styleName": "Shotokan",
   "kihonCombinations": [
     {

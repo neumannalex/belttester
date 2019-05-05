@@ -42,6 +42,7 @@
     <None Remove="ClientApp\src\app\moves\moves-list.component.ts" />
     <None Remove="ClientApp\src\app\profile\profile-menu.component.ts" />
     <None Remove="ClientApp\src\app\programs\programs-detail.component.ts" />
+    <None Remove="ClientApp\src\app\programs\programs-edit.component.ts" />
     <None Remove="ClientApp\src\app\programs\programs-list.component.ts" />
     <None Remove="ClientApp\src\app\programview\combination-view.component.ts" />
     <None Remove="ClientApp\src\app\programview\motion-view.component.ts" />
@@ -85,6 +86,7 @@
     <TypeScriptCompile Include="ClientApp\src\app\moves\moves-add.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\profile\profile-menu.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\programs\programs-detail.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\programs\programs-edit.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\programs\programs-list.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\programview\combination-view.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\programview\motion-view.component.ts" />
@@ -112,6 +114,21 @@
 
   <ItemGroup>
     <None Update="ClientApp\src\assets\img\belttester-logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\dan-5.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\dan-4.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\dan-3.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\dan-2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Seed\dan-1.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Data\Seed\kyu-1.txt">

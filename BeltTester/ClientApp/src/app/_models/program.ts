@@ -8,20 +8,20 @@ export interface Program {
   graduationType: string,
   graduationColor: string,
   name: string,
-  stylename: string,
-  combinations: Combination[]
+  styleName: string,
+  kihonCombinations: Combination[]
 }
 
 export interface Combination {
   id: number,
-  programid: number,
-  sequencenumber: number,
+  programId: number,
+  sequenceNumber: number,
   motions: Motion[]
 }
 
 export interface Motion {
   id: number,
-  sequencenumber: number,
+  sequenceNumber: number,
   stance: Stance,
   move: Move,
   technique: Technique,
