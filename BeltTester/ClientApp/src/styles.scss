@@ -1,10 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~bootstrap/dist/css/bootstrap.css";
 @import "~font-awesome/css/font-awesome.css";
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono|Roboto:300,400');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import '~@angular/material/theming';
+
 
 
 /* Sortable table */
-th[sortable] {
+/*th[sortable] {
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
@@ -25,9 +29,9 @@ th[sortable] {
   th[sortable].desc:before {
     transform: rotate(180deg);
     -ms-transform: rotate(180deg);
-  }
+  }*/
 
 /* Highlight filter result */
-ngbd-table-filtering span.ngb-highlight {
+/*ngbd-table-filtering span.ngb-highlight {
   background-color: yellow;
-}
+}*/

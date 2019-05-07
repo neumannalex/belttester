@@ -25,21 +25,25 @@
           <div>
             <span>
               <mat-form-field class="form-element">
-                <mat-label>Gürtelfarbe</mat-label>
-                <input matInput placeholder="#ffffff" formControlName="graduationColor">
-              </mat-form-field>
-            </span>
-            <span>
-              <mat-form-field class="form-element">
                 <mat-label>Graduierung</mat-label>
                 <input matInput type="number" min="1" max="9" placeholder="9" formControlName="graduation">
               </mat-form-field>
+              <mat-radio-group formControlName="graduationType">
+                <mat-radio-button value="Kyu" class="form-element" style="margin: 0 8px;">Kyu</mat-radio-button>
+                <mat-radio-button value="Dan" class="form-element" style="margin: 0 8px;">Dan</mat-radio-button>
+              </mat-radio-group>
+            </span>
+          </div>
+
+          <div>
+            <span>
+              <mat-form-field>
+                <mat-label>Gürtelfarbe</mat-label>
+                <input matInput mccColorPickerOrigin #trigger="mccColorPickerOrigin" formControlName="graduationColor" />
+              </mat-form-field>
             </span>
             <span>
-              <mat-radio-group formControlName="graduationType">
-                <mat-radio-button value="Kyu" class="form-element" style="margin: 0 12px;">Kyu</mat-radio-button>
-                <mat-radio-button value="Dan" class="form-element" style="margin: 0 12px;">Dan</mat-radio-button>
-              </mat-radio-group>
+              <mcc-color-picker mccConnectedColorPicker [mccConnectedColorPickerOrigin]="trigger" hideEmpty hideTransparent hideUsedColors btnConfirm="OK" class="form-element" style="margin: 0 12px;"></mcc-color-picker>
             </span>
           </div>
         </div>
@@ -58,8 +62,12 @@
 
                   <!-- Kombination -->
                   <fieldset style="border:solid; padding: 2px">
-                    <legend>Kombination {{combination.value.sequenceNumber}}</legend>
-                    <button>Kombination löschen</button>
+                    <legend>
+                      <span>Kombination {{combination.value.sequenceNumber}}</span>
+                      <span><i class="fas fa-minus-square px-2" (click)="deleteCombination(i)" matTooltip="Kombination löschen" matTooltipPosition="after"></i></span>
+                      <span><i class="fas fa-plus-square px-2" (click)="addCombination()" matTooltip="Kombination hinzufügen" matTooltipPosition="after" *ngIf="i == programForm.get('kihonCombinations').controls.length - 1"></i></span>
+                    </legend>
+                    <!--<button>Kombination löschen</button>-->
                     <div [formGroupName]="i">
                       <div formArrayName="motions">
                         <div *ngFor="let motion of combination.get('motions').controls; let j = index">
@@ -108,7 +116,7 @@
                   <!-- Kombination -->
 
                 </div>
-                <button >Kombination hinzufügen</button>
+                <!--<button >Kombination hinzufügen</button>-->
               </div>
             </div>
           </mat-expansion-panel>

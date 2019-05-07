@@ -27,3 +27,7 @@
 .button {
   width: 100%;
 }
+
+::ng-deep .mcc-color-picker-selector-preview {
+  box-sizing: content-box;
+}

@@ -10,6 +10,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, retry } from 'rxjs/operators';
 import { Stance, Move } from '../_models';
 import { CombinationViewComponent } from '../programview/combination-view.component';
+import { MccColorPickerService } from 'material-community-components';
 
 @Component({
   selector: 'programs-edit',
@@ -30,7 +31,7 @@ export class ProgramsEditComponent implements OnInit, OnDestroy  {
   techniquesList: Technique[] = [];
 
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private dataService: DataService, private snackBar: MatSnackBar) { }
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private dataService: DataService, private snackBar: MatSnackBar, private mccColorPickerService: MccColorPickerService) { }
 
   ngOnInit() {
     console.log("ProgramsEditComponent");
@@ -160,23 +161,45 @@ export class ProgramsEditComponent implements OnInit, OnDestroy  {
     return arr;
   }
 
+  addCombination() {
+    let combinationsListControl = <FormArray>(<FormArray>this.programForm.controls.kihonCombinations);
+    let s = combinationsListControl.length + 1;
+
+    combinationsListControl.push(this.fb.group({
+      id: 0,
+      programId: 0,
+      sequenceNumber: s,
+      motions: this.fb.array([])
+    }));
+
+    this.addMotion(combinationsListControl.length - 1);
+  }
+
+  deleteCombination(combinationIdx: number) {
+    let combinationsListControl = <FormArray>(<FormArray>this.programForm.controls.kihonCombinations);
+    combinationsListControl.removeAt(combinationIdx);
+  }
+
   addMotion(combinationIdx: number) {
     let motionsListControl = <FormArray>(<FormArray>this.programForm.controls.kihonCombinations).at(combinationIdx).get('motions');
+    //let s = this.program.kihonCombinations[combinationIdx].motions[this.program.kihonCombinations[combinationIdx].motions.length - 1].sequenceNumber + 1;
+    let s = motionsListControl.length + 1;
+
     motionsListControl.push(this.fb.group({
-      id: null,
-      sequenceNumber: null,
+      id: 0,
+      sequenceNumber: s,
       stance: this.fb.group({
-        id: null,
+        id: 0,
         name: '',
         symbol: ''
       }),
       move: this.fb.group({
-        id: null,
+        id: 0,
         name: '',
         symbol: ''
       }),
       technique: this.fb.group({
-        id: null,
+        id: 0,
         name: '',
         level: ''
       }),

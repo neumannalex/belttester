@@ -7,6 +7,10 @@ import { HttpClientModule, HTTP_INTERCEPTORS  } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+//import { ColorPickerModule } from 'ngx-color-picker';
+//import { MatColorPickerModule } from 'mat-color-picker';
+import { MccColorPickerModule } from 'material-community-components';
+//import { ColorPickerModule } from 'primeng/colorpicker';
 
 import {
   MatAutocompleteModule,
@@ -143,6 +147,14 @@ import { routing } from './app.routing';
     MatTooltipModule,
     MatStepperModule,
     CdkTableModule,
+    //ColorPickerModule,
+    //ColorPickerModule,
+    //MccColorPickerModule,
+    //MatColorPickerModule,
+    MccColorPickerModule.forRoot({used_colors: []}),
+    //MccColorPickerModule.forRoot({
+    //  used_colors: ['#000000', '#123456', '#777666']
+    //}),
     routing
   ],
   exports: [
